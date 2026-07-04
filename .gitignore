@@ -1,0 +1,17 @@
+# Build system output
+build/
+
+# Object files
+*.o
+*.d
+
+# Archives (local build artifacts only)
+*.a
+
+# Shared objects (local only)
+*.so
+
+# Core dumps
+core
+vgcore.*
+*.core

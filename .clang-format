@@ -1,0 +1,48 @@
+# Green Threads Runtime Engine - Codebase Formatting Rules
+
+Language: Cpp
+BasedOnStyle: LLVM
+
+AccessModifierOffset: -4
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: false
+AlignEscapedNewlines: Right
+AlignOperands: true
+AlignTrailingComments: true
+
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: false
+  AfterClass: false
+  AfterControlStatement: false
+  AfterEnum: false
+  AfterFunction: true      # Functions open braces on a fresh newline
+  AfterNamespace: false
+  AfterObjCDeclaration: false
+  AfterStruct: true        # Struct definition blocks open braces on a fresh newline
+  AfterUnion: false
+  BeforeCatch: false
+  BeforeElse: false
+  IndentBraces: false
+  SplitEmptyFunction: true
+
+BinPackArguments: false
+BinPackParameters: false
+ColumnLimit: 100            # Standard wide readability viewport bound
+IndentWidth: 4              # Clear visual hierarchy nesting (4 spaces)
+PointerAlignment: Right     # Explicit standard alignment syntax: 'void* ptr' -> 'void *ptr'
+SpaceAfterCStyleCast: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: ControlStatements
+SpacesInContainerLiterals: false
+TabWidth: 4
+UseTab: Never               # Force pure spaces to guarantee uniform layout on any monitor
+
