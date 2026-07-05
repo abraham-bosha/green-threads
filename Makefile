@@ -10,6 +10,19 @@ MKDIR   := mkdir -p
 
 
 # ============================================================================
+# Build Verbosity Control 
+# ============================================================================
+
+V ?= 0 
+
+ifeq ($(V),1)
+    Q := 
+else 
+    Q := @
+endif
+
+
+# ============================================================================
 # Project Layout
 # ============================================================================
 
@@ -121,7 +134,7 @@ DEPS := $(SRCS:$(SRC_DIR)/%.c=$(DEP_DIR)/%.d)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@$(MKDIR) $(dir $@)
 	@$(MKDIR) $(dir $(DEP_DIR)/$*)
-	$(CC) \
+	$(Q)$(CC) \
 		$(CPPFLAGS_SRC) \
 		$(COMMON_CFLAGS) \
 		$(PROFILE_CFLAGS) \
@@ -156,7 +169,7 @@ $(TEST_BINS): $(TEST_SRCS) $(LIB_TARGET)
 $(BIN_DIR)/tests/%: $(TEST_DIR)/%.c $(LIB_TARGET)
 	@$(MKDIR) $(dir $@)
 	@echo "[TEST] Building $@"
-	$(CC) \
+	$(Q)$(CC) \
 		$(CPPFLAGS_TEST) \
 		$(COMMON_CFLAGS) \
 		$(PROFILE_CFLAGS) \
@@ -171,14 +184,14 @@ $(BIN_DIR)/tests/%: $(TEST_DIR)/%.c $(LIB_TARGET)
 
 EXAMPLE_SRCS := $(shell find $(EXAMPLE_DIR) -name 'main.c' 2>/dev/null)
 
-EXAMPLE_BINS := $(EXAMPLE_SRCS:$(EXAMPLE_DIR)/%/main.c=$(BIN_DIR)/examples/%)
+EXAMPLE_BINS := $(EXAMPLE_SRCS:$(EXAMPLE_DIR)/%.c=$(BIN_DIR)/examples/%)
 
 $(EXAMPLE_BINS): $(LIB_TARGET)
 
-$(BIN_DIR)/examples/%: $(EXAMPLE_DIR)/%/main.c $(LIB_TARGET)
+$(BIN_DIR)/examples/%: $(EXAMPLE_DIR)/%.c $(LIB_TARGET)
 	@$(MKDIR) $(dir $@)
 	@echo "[EXAMPLE] Building $@"
-	$(CC) \
+	$(Q)$(CC) \
 		$(CPPFLAGS_EXAMPLE) \
 		$(COMMON_CFLAGS) \
 		$(PROFILE_CFLAGS) \
@@ -193,14 +206,14 @@ $(BIN_DIR)/examples/%: $(EXAMPLE_DIR)/%/main.c $(LIB_TARGET)
 
 BENCH_SRCS := $(shell find $(BENCH_DIR) -name 'main.c' 2>/dev/null)
 
-BENCH_BINS := $(BENCH_SRCS:$(BENCH_DIR)/%/main.c=$(BIN_DIR)/benchmarks/%)
+BENCH_BINS := $(BENCH_SRCS:$(BENCH_DIR)/%.c=$(BIN_DIR)/benchmarks/%)
 
 $(BENCH_BINS): $(LIB_TARGET)
 
-$(BIN_DIR)/benchmarks/%: $(BENCH_DIR)/%/main.c $(LIB_TARGET)
+$(BIN_DIR)/benchmarks/%: $(BENCH_DIR)/%.c $(LIB_TARGET)
 	@$(MKDIR) $(dir $@)
 	@echo "[BENCHMARKS] Building $@"
-	$(CC) \
+	$(Q)$(CC) \
 		$(CPPFLAGS_BENCH) \
 		$(COMMON_CFLAGS) \
 		$(PROFILE_CFLAGS) \
@@ -255,7 +268,7 @@ benchmarks: $(BENCH_BINS)
 # ============================================================================
 
 clean:
-	@echo "[CLEAN] Removing build directory..."
+	@echo "[CLEAN] Removing build directory"
 	@$(RM) $(BUILD_DIR)
 
 
@@ -267,7 +280,7 @@ rebuild: clean all
 # ============================================================================
 
 run-tests: tests
-	@echo "[RUN] Executing test suite..."
+	@echo "[RUN] tests"
 	@set -e; \
 	for test in $(TEST_BINS); do \
 		echo "-> $$test"; \
@@ -280,7 +293,7 @@ run-tests: tests
 # ============================================================================
 
 run-examples: examples
-	@echo "[RUN] Executing examples..."
+	@echo "[RUN] examples"
 	@for example in $(EXAMPLE_BINS); do \
 		echo "-> $$example"; \
 		$$example; \
@@ -292,7 +305,7 @@ run-examples: examples
 # ============================================================================
 
 run-benchmarks: benchmarks
-	@echo "[RUN] Executing benchmarks..."
+	@echo "[RUN] benchmarks"
 	@for bench in $(BENCH_BINS); do \
 		echo "-> $$bench"; \
 		$$bench; \
@@ -304,7 +317,7 @@ run-benchmarks: benchmarks
 # ============================================================================
 
 lint:
-	@echo "[LINT] Running cppcheck..."
+	@echo "[LINT] Running cppcheck"
 	@if [ -z "$(SRCS)" ]; then \
 		echo "No source files found in $(SRC_DIR)"; \
 		exit 1; \
@@ -313,6 +326,9 @@ lint:
 		--enable=all \
 		--error-exitcode=1 \
 		--inline-suppr \
+		--suppress=missingIncludeSystem \
+		--suppress=unusedFunction \
+		--suppress=checkersReport \
 		-I$(PUBLIC_INC_DIR) \
 		-I$(PRIVATE_INC_DIR) \
 		$(SRCS)
@@ -323,7 +339,7 @@ lint:
 # ============================================================================
 
 format:
-	@echo "[FORMAT] Formatting source tree..."
+	@echo "[FORMAT] source tree"
 	@find \
 		$(SRC_DIR) $(INC_DIR) $(TEST_DIR) $(EXAMPLE_DIR) $(BENCH_DIR) \
 		-type f \
@@ -343,7 +359,7 @@ check: lint tests run-tests
 # ============================================================================
 
 check-env:
-	@echo "[CHECK] Verifying build environment..."
+	@echo "[CHECK] build environment"
 
 	@command -v $(CC) >/dev/null || { echo "Missing compiler: $(CC)"; exit 1; }
 	@command -v $(AR) >/dev/null || { echo "Missing archiver: $(AR)"; exit 1; }
