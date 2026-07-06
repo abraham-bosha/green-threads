@@ -1,48 +1,66 @@
-# Green Threads Runtime Engine - Codebase Formatting Rules
+# Green Threads Runtime Engine - Formatting Rules
 
 Language: Cpp
-BasedOnStyle: LLVM
+BasedOnStyle: Google
 
 AccessModifierOffset: -4
-AlignAfterOpenBracket: Align
-AlignConsecutiveAssignments: true
-AlignConsecutiveDeclarations: false
-AlignEscapedNewlines: Right
-AlignOperands: true
-AlignTrailingComments: true
 
-AllowAllParametersOfDeclarationOnNextLine: false
-AllowShortBlocksOnASingleLine: false
-AllowShortCaseLabelsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: None
-AllowShortIfStatementsOnASingleLine: false
-AllowShortLoopsOnASingleLine: false
-
+# ---------------------------
+# Braces
+# ---------------------------
 BreakBeforeBraces: Custom
 BraceWrapping:
-  AfterCaseLabel: false
-  AfterClass: false
-  AfterControlStatement: false
-  AfterEnum: false
-  AfterFunction: true      # Functions open braces on a fresh newline
+  AfterFunction: true
+  AfterStruct: true
+  AfterEnum: true
+  AfterControlStatement: true
+  AfterCaseLabel: true
   AfterNamespace: false
-  AfterObjCDeclaration: false
-  AfterStruct: true        # Struct definition blocks open braces on a fresh newline
-  AfterUnion: false
-  BeforeCatch: false
   BeforeElse: false
+  BeforeCatch: false
   IndentBraces: false
   SplitEmptyFunction: true
 
+# ---------------------------
+# Function formatting
+# ---------------------------
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+
+AlwaysBreakAfterReturnType: All
+
+# ---------------------------
+# Indentation
+# ---------------------------
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+
+# ---------------------------
+# Alignment
+# ---------------------------
+AlignConsecutiveAssignments: false
+AlignOperands: false
+AlignTrailingComments: true
+
+# ---------------------------
+# Line layout
+# ---------------------------
+ColumnLimit: 100
 BinPackArguments: false
 BinPackParameters: false
-ColumnLimit: 100            # Standard wide readability viewport bound
-IndentWidth: 4              # Clear visual hierarchy nesting (4 spaces)
-PointerAlignment: Right     # Explicit standard alignment syntax: 'void* ptr' -> 'void *ptr'
-SpaceAfterCStyleCast: false
-SpaceBeforeAssignmentOperators: true
-SpaceBeforeParens: ControlStatements
-SpacesInContainerLiterals: false
-TabWidth: 4
-UseTab: Never               # Force pure spaces to guarantee uniform layout on any monitor
 
+# ---------------------------
+# Pointers
+# ---------------------------
+PointerAlignment: Right
+
+# ---------------------------
+# Spacing rules
+# ---------------------------
+SpaceBeforeParens: ControlStatements
+SpaceAfterCStyleCast: false
+SpacesInContainerLiterals: false
+SpaceBeforeAssignmentOperators: true

@@ -1,5 +1,4 @@
 #include <gt/version.h>
-
 #include <stdint.h>
 
 /*
@@ -8,12 +7,14 @@
  * Exposes immutable library metadata to external and internal execution loops.
  */
 
-uint32_t gt_version_number(void)
+uint32_t
+gt_version_number(void)
 {
     return GT_VERSION_NUMBER;
 }
 
-const char *gt_version_string(void)
+const char *
+gt_version_string(void)
 {
     return GT_VERSION_STRING;
 }

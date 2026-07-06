@@ -251,6 +251,79 @@ Code shall refer to structures using the struct keyword.
 
 ---
 
+# Function Declarations
+
+Function declarations and definitions shall place the return type on a separate
+line from the function name.
+
+This convention applies uniformly to:
+
+- public functions
+- internal functions
+- static functions
+- extern declarations
+- the `main()` function
+
+Example:
+
+```c
+const char *
+gt_version_string(void);
+
+static void
+scheduler_run(void);
+
+int
+main(void);
+```
+
+---
+
+## Brace Style
+
+```markdown
+# Brace Style
+
+Opening braces shall always appear on a new line.
+
+This rule applies uniformly to all language constructs, including:
+
+- functions
+- if statements
+- else statements
+- switch statements
+- loops
+- structures
+- unions
+- enumerations
+
+Examples:
+
+```c
+if (condition)
+{
+    ...
+}
+
+struct gt_task
+{
+    ...
+};
+
+enum gt_status
+{
+    ...
+};
+
+int
+main(void)
+{
+    ...
+}
+```
+
+---
+
 # Header Files
 
 Every header shall begin with:

@@ -1,8 +1,7 @@
+#include <assert.h>
+#include <gt/version.h>
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
-
-#include <gt/version.h>
 
 /*
  * Version subsystem contract test.
@@ -14,10 +13,14 @@
  * Ensures no mismatch between headers and linked library.
  */
 
-extern const char *gt_version_string(void);
-extern uint32_t    gt_version_number(void);
+extern const char *
+gt_version_string(void);
 
-static void test_compile_time(void)
+extern uint32_t
+gt_version_number(void);
+
+static void
+test_compile_time(void)
 {
     assert(GT_VERSION_MAJOR == 1);
     assert(GT_VERSION_MINOR == 0);
@@ -27,7 +30,8 @@ static void test_compile_time(void)
     assert(strcmp(GT_VERSION_STRING, "1.0.0") == 0);
 }
 
-static void test_runtime(void)
+static void
+test_runtime(void)
 {
     assert(strcmp(gt_version_string(), "1.0.0") == 0);
 
@@ -36,7 +40,8 @@ static void test_runtime(void)
     assert(v == GT_VERSION_NUMBER);
 }
 
-int main(void)
+int
+main(void)
 {
     printf("[RUN] version\n");
 
