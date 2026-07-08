@@ -2,7 +2,7 @@
 
 Version: 1.0
 
-Status: Frozen
+Status: Draft
 
 ---
 
@@ -72,8 +72,6 @@ common/
 
 - project types
 - compiler abstraction
-- assertions
-- panic system
 - macros
 - bit utilities
 

@@ -1,16 +1,10 @@
 # Project Contract
 
-## Project
+Project green\_threads
 
-green\_threads
+Version: 1.0
 
-## Version
-
-Version 1.0
-
-## Status
-
-Frozen
+Status: Draft
 
 ---
 

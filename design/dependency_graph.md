@@ -2,7 +2,7 @@
 
 Version: 1.0
 
-Status: Frozen
+Status: Draft
 
 ---
 
@@ -316,12 +316,9 @@ Common provides shared utilities used throughout the runtime.
 
 Examples include:
 
-- assertions
-- panic handling
 - compiler abstractions
 - bit utilities
 - macros
-- utility helpers
 
 ### May depend on
 

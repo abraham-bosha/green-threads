@@ -2,7 +2,7 @@
 
 Version: 1.0
 
-Status: Frozen
+Status: Draft
 
 ---
 
@@ -275,8 +275,6 @@ The common module provides shared utilities.
 
 Responsibilities
 
-- assertions
-- panic handling
 - compiler abstractions
 - project types
 - common macros
