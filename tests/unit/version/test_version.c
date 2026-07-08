@@ -1,8 +1,7 @@
 #include <assert.h>
+#include <gt/version.h>
 #include <stdio.h>
 #include <string.h>
-
-#include <gt/version.h>
 
 /*
  * Version subsystem contract test.

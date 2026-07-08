@@ -1,8 +1,7 @@
 #include <assert.h>
+#include <gt/error.h>
 #include <stdio.h>
 #include <string.h>
-
-#include <gt/error.h>
 
 static void
 test_compile_time_status_values(void)

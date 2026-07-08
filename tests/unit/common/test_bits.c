@@ -1,9 +1,8 @@
 #include <assert.h>
+#include <gt_internal/common/bits.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-
-#include <gt_internal/common/bits.h>
 
 void
 test_bits_and_word_widths(void)

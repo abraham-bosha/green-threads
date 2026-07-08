@@ -1,7 +1,6 @@
-#include <stdio.h>
 #include <assert.h>
-
 #include <gt_internal/common/mem.h>
+#include <stdio.h>
 
 void
 test_page_size(void)

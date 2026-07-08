@@ -275,11 +275,11 @@ Memory ownership must always be explicit.
 
 # Error Handling
 
-Recoverable errors return explicit status codes.
+Recoverable errors are reported to the caller using explicit status codes.
 
-Unrecoverable internal errors terminate through the panic subsystem.
+Violations of internal runtime invariants are fatal and must terminate through the panic subsystem.
 
-Undefined behavior must never be relied upon.
+The runtime must never rely on undefined behavior.
 
 ---
 
