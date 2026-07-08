@@ -1,7 +1,8 @@
 #include <assert.h>
-#include <gt/version.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <gt/version.h>
 
 /*
  * Version subsystem contract test.
@@ -43,11 +44,11 @@ test_runtime(void)
 int
 main(void)
 {
-    printf("[RUN] version\n");
+    printf("[RUN] runtime/version\n");
 
     test_compile_time();
     test_runtime();
 
-    printf("[PASS] version\n");
+    printf("[PASSED] runtime/version\n");
     return 0;
 }

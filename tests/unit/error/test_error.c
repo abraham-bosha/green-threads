@@ -1,7 +1,8 @@
 #include <assert.h>
-#include <gt/error.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <gt/error.h>
 
 static void
 test_compile_time_status_values(void)
@@ -28,11 +29,11 @@ test_status_string_mapping(void)
 int
 main(void)
 {
-    printf("[RUN] error module\n");
+    printf("[RUN] runtime/error\n");
 
     test_compile_time_status_values();
     test_status_string_mapping();
 
-    printf("[PASSED] error module\n");
+    printf("[PASSED] runtime/error\n");
     return 0;
 }
