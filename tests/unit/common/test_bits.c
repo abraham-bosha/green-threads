@@ -1,5 +1,6 @@
-#include <assert.h>
 #include <gt_internal/common/bits.h>
+
+#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -35,13 +36,13 @@ test_power_of_two_predicate(void)
 int
 main(void)
 {
-    printf("[RUN] common/bits\n");
+    puts("[RUN] common/bits");
 
     test_bits_and_word_widths();
     test_bit64_mask_generation();
     test_power_of_two_predicate();
 
-    printf("[PASSED] common/bits\n");
+    puts("[PASS] common/bits");
 
     return 0;
 }

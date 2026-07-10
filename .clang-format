@@ -5,9 +5,7 @@ BasedOnStyle: Google
 
 AccessModifierOffset: -4
 
-# ---------------------------
 # Braces
-# ---------------------------
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterFunction: true
@@ -21,46 +19,37 @@ BraceWrapping:
   IndentBraces: false
   SplitEmptyFunction: true
 
-# ---------------------------
-# Function formatting
-# ---------------------------
+# Functions
 AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: false
-
 AlwaysBreakAfterReturnType: All
 
-# ---------------------------
 # Indentation
-# ---------------------------
 IndentWidth: 4
 TabWidth: 4
 UseTab: Never
 
-# ---------------------------
 # Alignment
-# ---------------------------
 AlignConsecutiveAssignments: false
 AlignOperands: false
 AlignTrailingComments: true
 
-# ---------------------------
-# Line layout
-# ---------------------------
+# Line Layout
 ColumnLimit: 100
 BinPackArguments: false
 BinPackParameters: false
 
-# ---------------------------
 # Pointers
-# ---------------------------
 PointerAlignment: Right
 
-# ---------------------------
-# Spacing rules
-# ---------------------------
+# Spacing
 SpaceBeforeParens: ControlStatements
 SpaceAfterCStyleCast: false
 SpacesInContainerLiterals: false
 SpaceBeforeAssignmentOperators: true
+
+# Header Includes Management
+IncludeBlocks: Preserve
+SortIncludes: true

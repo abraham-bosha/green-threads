@@ -42,8 +42,7 @@
  * @param fmt_index 1-based index of the format string parameter.
  * @param arg_index 1-based index of the first variadic argument.
  */
-#define GT_PRINTF_FORMAT(fmt_index, arg_index) \
-    __attribute__((format(printf, fmt_index, arg_index)))
+#define GT_PRINTF_FORMAT(fmt_index, arg_index) __attribute__((format(printf, fmt_index, arg_index)))
 
 /**
  * @brief Aligns an object to the specified byte boundary.

@@ -1,5 +1,6 @@
-#include <assert.h>
 #include <gt/version.h>
+
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 

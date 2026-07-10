@@ -1,5 +1,6 @@
-#include <assert.h>
 #include <gt_internal/common/mem.h>
+
+#include <assert.h>
 #include <stdio.h>
 
 void
@@ -11,11 +12,11 @@ test_page_size(void)
 int
 main(void)
 {
-    printf("[RUN] common/mem\n");
+    puts("[RUN] common/mem");
 
     test_page_size();
 
-    printf("[PASSED] common/mem\n");
+    puts("[PASS] common/mem");
 
     return 0;
 }

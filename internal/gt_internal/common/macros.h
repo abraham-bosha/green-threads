@@ -6,6 +6,19 @@
 #define GT_UNUSED(x) ((void)(x))
 
 /**
+ * @brief Begins a safe multi-statement macro expansion.
+ */
+#define GT_MACRO_BEGIN \
+    do                 \
+    {
+/**
+ * @brief Ends a safe multi-statement macro expansion.
+ */
+#define GT_MACRO_END \
+    }                \
+    while (0)
+
+/**
  * @brief Two-step preprocessor macros to safely convert code tokens into string literals.
  */
 #define GT_STRINGIFY_HELPER(x) #x
@@ -23,9 +36,11 @@
 #define GT_OFFSET_OF(type, member) offsetof(type, member)
 
 /**
- * @brief Casts a pointer to a nested structural element back into a pointer to its parent enclosure container.
+ * @brief Casts a pointer to a nested structural element back into a pointer to its parent enclosure
+ * container.
  */
-#define GT_CONTAINER_OF(ptr, type, member) ({                      \
-    const __typeof__(((type *)0)->member) *__mptr = (ptr);         \
-    (type *)((char *)__mptr - GT_OFFSET_OF(type, member));         \
-})
+#define GT_CONTAINER_OF(ptr, type, member)                     \
+    ({                                                         \
+        const __typeof__(((type *)0)->member) *__mptr = (ptr); \
+        (type *)((char *)__mptr - GT_OFFSET_OF(type, member)); \
+    })

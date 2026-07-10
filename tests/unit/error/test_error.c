@@ -1,5 +1,6 @@
-#include <assert.h>
 #include <gt/error.h>
+
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -33,6 +34,6 @@ main(void)
     test_compile_time_status_values();
     test_status_string_mapping();
 
-    printf("[PASSED] runtime/error\n");
+    printf("[PASS] runtime/error\n");
     return 0;
 }

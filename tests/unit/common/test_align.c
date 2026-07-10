@@ -1,5 +1,6 @@
-#include <assert.h>
 #include <gt_internal/common/align.h>
+
+#include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -53,14 +54,14 @@ test_alignment_predicate(void)
 int
 main(void)
 {
-    printf("[RUN] common/align\n");
+    puts("[RUN] common/align");
 
     test_power_of_two_alignment_up();
     test_power_of_two_alignment_down();
     test_arbitrary_alignment_any();
     test_alignment_predicate();
 
-    printf("[PASSED] common/align\n");
+    puts("[PASS] common/align");
 
     return 0;
 }

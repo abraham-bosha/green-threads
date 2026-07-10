@@ -22,11 +22,7 @@
  * @note Returns nothing.
  */
 GT_NORETURN void
-gt_panic(
-    const char *filename,
-    int line,
-    const char *function,
-    const char *message);
+gt_panic(const char *filename, int line, const char *function, const char *message);
 
 /**
  * @brief Reports a fatal runtime failure using the current source location.
@@ -34,4 +30,4 @@ gt_panic(
  * Automatically captures the source file, function name, and line number,
  * reducing boilerplate and ensuring consistent diagnostics.
  */
-#define GT_PANIC(message) gt_panic(__FILE__, __LINE__, __func__, (message)) 
+#define GT_PANIC(message) gt_panic(__FILE__, __LINE__, __func__, (message))

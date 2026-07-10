@@ -17,7 +17,8 @@ typedef uintptr_t gt_addr_t;
 /**
  * @brief Runtime lifecycle states.
  */
-typedef enum {
+typedef enum
+{
     GT_RUNTIME_UNINITIALIZED = 0, /* Runtime has not been initialized. */
     GT_RUNTIME_INITIALIZED,       /* Runtime is initialized and ready. */
     GT_RUNTIME_RUNNING,           /* Scheduler is actively executing tasks. */
@@ -28,17 +29,19 @@ typedef enum {
 /**
  * @brief Task execution lifecycle states.
  */
-typedef enum {
-    GT_TASK_STATE_CREATED = 0,  /* Created but not yet scheduled. */
-    GT_TASK_STATE_READY,        /* Ready to execute. */
-    GT_TASK_STATE_RUNNING,      /* Currently executing. */
-    GT_TASK_STATE_COMPLETED     /* Finished execution. */
+typedef enum
+{
+    GT_TASK_STATE_CREATED = 0, /* Created but not yet scheduled. */
+    GT_TASK_STATE_READY,       /* Ready to execute. */
+    GT_TASK_STATE_RUNNING,     /* Currently executing. */
+    GT_TASK_STATE_COMPLETED    /* Finished execution. */
 } gt_task_state_t;
 
 /**
  * @brief Supported context-switch backend implementations.
  */
-typedef enum {
+typedef enum
+{
     GT_BACKEND_UCONTEXT = 0, /* POSIX ucontext backend. */
     GT_BACKEND_SETJMP,       /* setjmp/longjmp backend. */
     GT_BACKEND_ASM,          /* Assembly backend. */
