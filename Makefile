@@ -26,10 +26,10 @@ endif
 # Project Layout
 # ============================================================================
 
-SRC_DIR       := src
-TEST_DIR      := tests
-EXAMPLE_DIR   := examples
-BENCH_DIR     := benchmarks
+SRC_DIR           := src
+TEST_DIR          := tests
+EXAMPLE_DIR       := examples
+BENCHMARK_DIR     := benchmarks
 
 PUBLIC_INC_DIR       := include
 PRIVATE_INC_DIR      := internal
@@ -51,13 +51,20 @@ DEBUG_CFLAGS := \
 	-O0 \
 	-g3 \
 	-DDEBUG \
+    -DGT_LOG_ENABLED \
+    -DGT_LOG_LEVEL=GT_LOG_LEVEL_TRACE \
 	-fno-omit-frame-pointer
 
 RELEASE_CFLAGS := \
     -O2  \
-    -DNDEBUG  \
+    -DNDEBUG \
+    -DGT_LOG_ENABLED \
+    -DGT_LOG_LEVEL=GT_LOG_LEVEL_INFO \
     -flto
 
+BENCHMARK_CFLAGS :=  \
+    -O3  \
+    -DNGT_LOG_ENABLED
 
 # ============================================================================
 # Preprocessor Flags & Include Policies
@@ -286,20 +293,20 @@ $(BIN_DIR)/tests/unit/%: $(OBJ_DIR)/tests/unit/%.o $(GT_LIB) $(TEST_SUPPORT_LIB)
 # ============================================================================
 
 EXAMPLE_SRCS := \
-	$(shell find $(EXAMPLE_DIR) -name '*.c' 2>/dev/null)
+	$(shell find $(EXAMPLE_DIR) -name 'main.c' 2>/dev/null)
 
 EXAMPLE_DEPS := \
-	$(EXAMPLE_SRCS:$(EXAMPLE_DIR)/%.c=$(DEP_DIR)/examples/%.d)
+	$(EXAMPLE_SRCS:$(EXAMPLE_DIR)/%/main.c=$(DEP_DIR)/examples/%.d)
 
 EXAMPLE_BINS := \
-	$(EXAMPLE_SRCS:$(EXAMPLE_DIR)/%.c=$(BIN_DIR)/examples/%)
+	$(EXAMPLE_SRCS:$(EXAMPLE_DIR)/%/main.c=$(BIN_DIR)/examples/%)
 
 
 # ============================================================================
 # Example Object Compilation
 # ============================================================================
 
-$(OBJ_DIR)/examples/%.o: $(EXAMPLE_DIR)/%.c
+$(OBJ_DIR)/examples/%.o: $(EXAMPLE_DIR)/%/main.c
 	$(Q)$(MKDIR) $(dir $@)
 	$(Q)$(MKDIR) $(dir $(DEP_DIR)/examples/$*.d)
 
