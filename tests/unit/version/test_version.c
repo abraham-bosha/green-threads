@@ -36,7 +36,7 @@ test_runtime(void)
 {
     assert(strcmp(gt_version_string(), "1.0.0") == 0);
 
-    uint32_t v = gt_version_number();
+    __attribute__((unused)) uint32_t v = gt_version_number();
     assert(v == 10000);
     assert(v == GT_VERSION_NUMBER);
 }
@@ -49,6 +49,6 @@ main(void)
     test_compile_time();
     test_runtime();
 
-    printf("[PASSED] runtime/version\n");
+    printf("[PASS] runtime/version\n");
     return 0;
 }

@@ -3,7 +3,7 @@
 # ============================================================================
 
 CC      := clang
-AR      := ar
+AR      := llvm-ar
 ARFLAGS := rcs
 RM      := rm -rf
 MKDIR   := mkdir -p
@@ -26,14 +26,14 @@ endif
 # Project Layout
 # ============================================================================
 
-SRC_DIR     := src
-INC_DIR     := include
-TEST_DIR    := tests
-EXAMPLE_DIR := examples
-BENCH_DIR   := benchmarks
+SRC_DIR       := src
+TEST_DIR      := tests
+EXAMPLE_DIR   := examples
+BENCH_DIR     := benchmarks
 
-PUBLIC_INC_DIR  := include
-PRIVATE_INC_DIR := internal
+PUBLIC_INC_DIR       := include
+PRIVATE_INC_DIR      := internal
+TEST_SUPPORT_INC_DIR := tests/support/include
 
 
 # ============================================================================
@@ -45,9 +45,7 @@ COMMON_CFLAGS := \
 	-Wall \
 	-Wextra \
 	-Werror \
-	-Wpedantic \
-	-MMD \
-	-MP
+	-Wpedantic
 
 DEBUG_CFLAGS := \
 	-O0 \
@@ -60,31 +58,43 @@ RELEASE_CFLAGS := \
     -DNDEBUG  \
     -flto
 
-LDFLAGS :=
-
-LDLIBS  :=
-
 
 # ============================================================================
-# Include Flags
+# Preprocessor Flags & Include Policies
 # ============================================================================
 
-CPPFLAGS_PUBLIC  := -I$(PUBLIC_INC_DIR)
-CPPFLAGS_PRIVATE := -I$(PRIVATE_INC_DIR)
+CPPFLAGS_PUBLIC := \
+    -I$(PUBLIC_INC_DIR)
 
-CPPFLAGS_SRC := \
-	$(CPPFLAGS_PUBLIC) \
-	$(CPPFLAGS_PRIVATE)
+CPPFLAGS_PRIVATE := \
+    -I$(PRIVATE_INC_DIR)
 
-CPPFLAGS_TEST := \
-	$(CPPFLAGS_PUBLIC) \
-	$(CPPFLAGS_PRIVATE)
+CPPFLAGS_TEST_SUPPORT := \
+    -I$(TEST_SUPPORT_INC_DIR)
 
+# Runtime library (src/)
+CPPFLAGS_RUNTIME := \
+    $(CPPFLAGS_PUBLIC) \
+    $(CPPFLAGS_PRIVATE)
+
+# Examples
 CPPFLAGS_EXAMPLE := \
-	$(CPPFLAGS_PUBLIC)
+    $(CPPFLAGS_PUBLIC)
 
-CPPFLAGS_BENCH := \
-	$(CPPFLAGS_PUBLIC)
+# Benchmarks
+CPPFLAGS_BENCHMARK := \
+    $(CPPFLAGS_PUBLIC)
+
+# Unit tests
+CPPFLAGS_UNIT := \
+    $(CPPFLAGS_PUBLIC) \
+    $(CPPFLAGS_PRIVATE) \
+    $(CPPFLAGS_TEST_SUPPORT)
+
+# Integration / Stress / Regression tests
+CPPFLAGS_PUBLIC_TEST := \
+    $(CPPFLAGS_PUBLIC) \
+    $(CPPFLAGS_TEST_SUPPORT)
 
 
 # ============================================================================
@@ -102,6 +112,14 @@ DEP_DIR := $(PROFILE_DIR)/dep
 LIB_DIR := $(PROFILE_DIR)/lib
 BIN_DIR := $(PROFILE_DIR)/bin
 
+# Track the active profile state inside a hidden file in the build directory
+PROFILE_TRACKER := $(BUILD_DIR)/.active_profile
+
+# Force a clean sweep if the requested profile doesn't match the last built profile
+ifneq ($(shell cat $(PROFILE_TRACKER) 2>/dev/null),$(PROFILE))
+    $(shell rm -rf $(BUILD_DIR) && mkdir -p $(BUILD_DIR) && echo $(PROFILE) > $(PROFILE_TRACKER))
+endif
+
 
 # ============================================================================
 # Profile Selection
@@ -117,108 +135,196 @@ endif
 
 
 # ============================================================================
-# Source Discovery
+# Linker Flags
 # ============================================================================
 
-SRCS := $(shell find $(SRC_DIR) -name '*.c' 2>/dev/null)
+LDFLAGS := $(PROFILE_CFLAGS)
 
-OBJS := $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
-
-DEPS := $(SRCS:$(SRC_DIR)/%.c=$(DEP_DIR)/%.d)
+LDLIBS  :=
 
 
 # ============================================================================
-# Object Compilation Rule
+# Runtime Library Sources
 # ============================================================================
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	@$(MKDIR) $(dir $@)
-	@$(MKDIR) $(dir $(DEP_DIR)/$*)
+RUNTIME_SRCS := \
+	$(shell find $(SRC_DIR) -name '*.c' 2>/dev/null)
+
+RUNTIME_OBJS := \
+	$(RUNTIME_SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/runtime/%.o)
+
+RUNTIME_DEPS := \
+	$(RUNTIME_SRCS:$(SRC_DIR)/%.c=$(DEP_DIR)/runtime/%.d)
+
+
+# ============================================================================
+# Runtime Object Compilation
+# ============================================================================
+
+$(OBJ_DIR)/runtime/%.o: $(SRC_DIR)/%.c
+	$(Q)$(MKDIR) $(dir $@)
+	$(Q)$(MKDIR) $(dir $(DEP_DIR)/runtime/$*.d)
+
 	$(Q)$(CC) \
-		$(CPPFLAGS_SRC) \
+		$(CPPFLAGS_RUNTIME) \
 		$(COMMON_CFLAGS) \
 		$(PROFILE_CFLAGS) \
-		-MF $(DEP_DIR)/$*.d \
+		-MMD -MP -MF $(DEP_DIR)/runtime/$*.d \
 		-c $< \
 		-o $@
 
 
 # ============================================================================
-# Static Library
+# Runtime Library
 # ============================================================================
 
-LIB_NAME   := libgt.a
-LIB_TARGET := $(LIB_DIR)/$(LIB_NAME)
+GT_LIB_NAME   := libgt.a
+GT_LIB        := $(LIB_DIR)/$(GT_LIB_NAME)
 
-$(LIB_TARGET): $(OBJS)
-	@$(MKDIR) $(dir $@)
-	@echo "[AR] Creating static library: $@"
-	@$(AR) $(ARFLAGS) $@ $^
+$(GT_LIB): $(RUNTIME_OBJS)
+	$(Q)$(MKDIR) $(dir $@)
+	@echo "[AR] $@"
+
+	$(Q)$(AR) $(ARFLAGS) $@ $^
 
 
 # ============================================================================
-# Tests
+# Test Support Library Sources
 # ============================================================================
 
-TEST_SRCS := $(shell find $(TEST_DIR) -name '*.c' 2>/dev/null)
+TEST_SUPPORT_SRCS := \
+	$(shell find $(TEST_DIR)/support/src -name '*.c' 2>/dev/null)
 
-TEST_BINS := $(TEST_SRCS:$(TEST_DIR)/%.c=$(BIN_DIR)/tests/%)
+TEST_SUPPORT_OBJS := \
+	$(TEST_SUPPORT_SRCS:$(TEST_DIR)/support/src/%.c=$(OBJ_DIR)/tests/support/%.o)
 
-$(TEST_BINS): $(TEST_SRCS) $(LIB_TARGET)
+TEST_SUPPORT_DEPS := \
+	$(TEST_SUPPORT_SRCS:$(TEST_DIR)/support/src/%.c=$(DEP_DIR)/tests/support/%.d)
 
-$(BIN_DIR)/tests/%: $(TEST_DIR)/%.c $(LIB_TARGET)
-	@$(MKDIR) $(dir $@)
-	@echo "[TEST] Building $@"
+
+# ============================================================================
+# Test Support Object Compilation
+# ============================================================================
+
+$(OBJ_DIR)/tests/support/%.o: $(TEST_DIR)/support/src/%.c
+	$(Q)$(MKDIR) $(dir $@)
+	$(Q)$(MKDIR) $(dir $(DEP_DIR)/tests/support/$*.d)
+
 	$(Q)$(CC) \
-		$(CPPFLAGS_TEST) \
+		$(CPPFLAGS_TEST_SUPPORT) \
 		$(COMMON_CFLAGS) \
 		$(PROFILE_CFLAGS) \
-		$< \
-		$(LIB_TARGET) \
+		-MMD -MP -MF $(DEP_DIR)/tests/support/$*.d \
+		-c $< \
 		-o $@
 
 
 # ============================================================================
-# Examples
+# Test Support Library
 # ============================================================================
 
-EXAMPLE_SRCS := $(shell find $(EXAMPLE_DIR) -name 'main.c' 2>/dev/null)
+TEST_SUPPORT_LIB_NAME := libtestsupport.a
+TEST_SUPPORT_LIB      := $(LIB_DIR)/$(TEST_SUPPORT_LIB_NAME)
 
-EXAMPLE_BINS := $(EXAMPLE_SRCS:$(EXAMPLE_DIR)/%.c=$(BIN_DIR)/examples/%)
+$(TEST_SUPPORT_LIB): $(TEST_SUPPORT_OBJS)
+	$(Q)$(MKDIR) $(dir $@)
+	@echo "[AR] $@"
 
-$(EXAMPLE_BINS): $(LIB_TARGET)
+	$(Q)$(AR) $(ARFLAGS) $@ $^
 
-$(BIN_DIR)/examples/%: $(EXAMPLE_DIR)/%.c $(LIB_TARGET)
-	@$(MKDIR) $(dir $@)
-	@echo "[EXAMPLE] Building $@"
+
+# ============================================================================
+# Unit Test Sources
+# ============================================================================
+
+UNIT_TEST_SRCS := \
+	$(shell find $(TEST_DIR)/unit -name '*.c' 2>/dev/null)
+
+UNIT_TEST_DEPS := \
+	$(UNIT_TEST_SRCS:$(TEST_DIR)/unit/%.c=$(DEP_DIR)/tests/unit/%.d)
+
+UNIT_TEST_BINS := \
+	$(UNIT_TEST_SRCS:$(TEST_DIR)/unit/%.c=$(BIN_DIR)/tests/unit/%)
+
+
+# ============================================================================
+# Unit Test Object Compilation
+# ============================================================================
+
+$(OBJ_DIR)/tests/unit/%.o: $(TEST_DIR)/unit/%.c
+	$(Q)$(MKDIR) $(dir $@)
+	$(Q)$(MKDIR) $(dir $(DEP_DIR)/tests/unit/$*.d)
+
+	$(Q)$(CC) \
+		$(CPPFLAGS_UNIT)  \
+		$(COMMON_CFLAGS)  \
+		$(PROFILE_CFLAGS) \
+		-MMD -MP -MF $(DEP_DIR)/tests/unit/$*.d \
+		-c $< \
+		-o $@
+
+
+# ============================================================================
+# Unit Tests Linking
+# ============================================================================
+
+$(BIN_DIR)/tests/unit/%: $(OBJ_DIR)/tests/unit/%.o $(GT_LIB) $(TEST_SUPPORT_LIB)
+	$(Q)$(MKDIR) $(dir $@)
+	@echo "[LD] $@"
+
+	$(Q)$(CC) \
+		$(LDFLAGS) \
+		$< \
+		$(GT_LIB) \
+		$(TEST_SUPPORT_LIB) \
+		$(LDLIBS) \
+		-o $@
+
+
+# ============================================================================
+# Example Sources
+# ============================================================================
+
+EXAMPLE_SRCS := \
+	$(shell find $(EXAMPLE_DIR) -name '*.c' 2>/dev/null)
+
+EXAMPLE_DEPS := \
+	$(EXAMPLE_SRCS:$(EXAMPLE_DIR)/%.c=$(DEP_DIR)/examples/%.d)
+
+EXAMPLE_BINS := \
+	$(EXAMPLE_SRCS:$(EXAMPLE_DIR)/%.c=$(BIN_DIR)/examples/%)
+
+
+# ============================================================================
+# Example Object Compilation
+# ============================================================================
+
+$(OBJ_DIR)/examples/%.o: $(EXAMPLE_DIR)/%.c
+	$(Q)$(MKDIR) $(dir $@)
+	$(Q)$(MKDIR) $(dir $(DEP_DIR)/examples/$*.d)
+
 	$(Q)$(CC) \
 		$(CPPFLAGS_EXAMPLE) \
 		$(COMMON_CFLAGS) \
 		$(PROFILE_CFLAGS) \
-		$< \
-		$(LIB_TARGET) \
+		-MMD -MP -MF $(DEP_DIR)/examples/$*.d \
+		-c $< \
 		-o $@
 
 
 # ============================================================================
-# Benchmarks
+# Example Linking
 # ============================================================================
 
-BENCH_SRCS := $(shell find $(BENCH_DIR) -name 'main.c' 2>/dev/null)
+$(BIN_DIR)/examples/%: $(OBJ_DIR)/examples/%.o $(GT_LIB)
+	$(Q)$(MKDIR) $(dir $@)
+	@echo "[LD] $@"
 
-BENCH_BINS := $(BENCH_SRCS:$(BENCH_DIR)/%.c=$(BIN_DIR)/benchmarks/%)
-
-$(BENCH_BINS): $(LIB_TARGET)
-
-$(BIN_DIR)/benchmarks/%: $(BENCH_DIR)/%.c $(LIB_TARGET)
-	@$(MKDIR) $(dir $@)
-	@echo "[BENCHMARKS] Building $@"
 	$(Q)$(CC) \
-		$(CPPFLAGS_BENCH) \
-		$(COMMON_CFLAGS) \
-		$(PROFILE_CFLAGS) \
+		$(LDFLAGS) \
 		$< \
-		$(LIB_TARGET) \
+		$(GT_LIB) \
+		$(LDLIBS) \
 		-o $@
 
 
@@ -228,13 +334,12 @@ $(BIN_DIR)/benchmarks/%: $(BENCH_DIR)/%.c $(LIB_TARGET)
 
 .PHONY: \
 	all \
-	lib \
+	libs \
+    unit \
 	tests \
 	examples \
-	benchmarks \
 	run-tests \
 	run-examples \
-	run-benchmarks \
 	clean \
 	rebuild \
 	check \
@@ -243,24 +348,26 @@ $(BIN_DIR)/benchmarks/%: $(BENCH_DIR)/%.c $(LIB_TARGET)
 	check-env \
 	help
 
+# Prevent GNU Make from deleting intermediate .o files
+.SECONDARY:
 
 # ============================================================================
 # Default Build
 # ============================================================================
 
-all: lib tests examples benchmarks
+all: libs tests examples
 
 
-lib: $(LIB_TARGET)
+libs: $(GT_LIB) $(TEST_SUPPORT_LIB)
 
 
-tests: $(TEST_BINS)
+unit: $(UNIT_TEST_BINS)
+
+
+tests: $(UNIT_TEST_BINS)
 
 
 examples: $(EXAMPLE_BINS)
-
-
-benchmarks: $(BENCH_BINS)
 
 
 # ============================================================================
@@ -269,7 +376,7 @@ benchmarks: $(BENCH_BINS)
 
 clean:
 	@echo "[CLEAN] Removing build directory"
-	@$(RM) $(BUILD_DIR)
+	$(Q)$(RM) $(BUILD_DIR)
 
 
 rebuild: clean all
@@ -280,11 +387,10 @@ rebuild: clean all
 # ============================================================================
 
 run-tests: tests
-	@echo "[RUN] tests"
-	@set -e; \
-	for test in $(TEST_BINS); do \
-		echo "-> $$test"; \
-		$$test || exit 1; \
+	@echo "[RUN] test suite"
+	$(Q)set -e; \
+	for test in $(UNIT_TEST_BINS); do \
+		$$test || { echo "Failure in binary: $$test"; exit 1; }; \
 	done
 
 
@@ -294,21 +400,10 @@ run-tests: tests
 
 run-examples: examples
 	@echo "[RUN] examples"
-	@for example in $(EXAMPLE_BINS); do \
+	$(Q)set -e; \
+	for example in $(EXAMPLE_BINS); do \
 		echo "-> $$example"; \
-		$$example; \
-	done
-
-
-# ============================================================================
-# Run Benchmarks
-# ============================================================================
-
-run-benchmarks: benchmarks
-	@echo "[RUN] benchmarks"
-	@for bench in $(BENCH_BINS); do \
-		echo "-> $$bench"; \
-		$$bench; \
+		$$example || { echo "Failure in binary: $$example"; exit 1; }; \
 	done
 
 
@@ -318,20 +413,23 @@ run-benchmarks: benchmarks
 
 lint:
 	@echo "[LINT] Running cppcheck"
-	@if [ -z "$(SRCS)" ]; then \
-		echo "No source files found in $(SRC_DIR)"; \
-		exit 1; \
-	fi
-	@cppcheck \
+	$(Q)cppcheck \
+        --quiet   \
 		--enable=all \
 		--error-exitcode=1 \
 		--inline-suppr \
 		--suppress=missingIncludeSystem \
 		--suppress=unusedFunction \
+		--suppress=unmatchedSuppression \
 		--suppress=checkersReport \
+		--suppress=duplicateExpression:tests/* \
+		--suppress=knownConditionTrueFalse:tests/* \
 		-I$(PUBLIC_INC_DIR) \
 		-I$(PRIVATE_INC_DIR) \
-		$(SRCS)
+		$(RUNTIME_SRCS) \
+        $(TEST_SUPPORT_SRCS) \
+		$(UNIT_TEST_SRCS) \
+		$(EXAMPLE_SRCS)
 
 
 # ============================================================================
@@ -339,9 +437,9 @@ lint:
 # ============================================================================
 
 format:
-	@echo "[FORMAT] source tree"
-	@find \
-		$(SRC_DIR) $(INC_DIR) $(TEST_DIR) $(EXAMPLE_DIR) $(BENCH_DIR) \
+	@echo "[FORMAT] project tree"
+	$(Q)find \
+		$(SRC_DIR) $(PUBLIC_INC_DIR) $(PRIVATE_INC_DIR) $(TEST_DIR) $(EXAMPLE_DIR) \
 		-type f \
 		\( -name '*.c' -o -name '*.h' \) \
 		-exec clang-format -i {} +
@@ -361,10 +459,10 @@ check: lint tests run-tests
 check-env:
 	@echo "[CHECK] build environment"
 
-	@command -v $(CC) >/dev/null || { echo "Missing compiler: $(CC)"; exit 1; }
-	@command -v $(AR) >/dev/null || { echo "Missing archiver: $(AR)"; exit 1; }
-	@command -v cppcheck >/dev/null || { echo "Missing cppcheck"; exit 1; }
-	@command -v clang-format >/dev/null || { echo "Missing clang-format"; exit 1; }
+	$(Q)command -v $(CC) >/dev/null || { echo "Missing compiler: $(CC)"; exit 1; }
+	$(Q)command -v $(AR) >/dev/null || { echo "Missing archiver: $(AR)"; exit 1; }
+	$(Q)command -v cppcheck >/dev/null || { echo "Missing cppcheck"; exit 1; }
+	$(Q)command -v clang-format >/dev/null || { echo "Missing clang-format"; exit 1; }
 
 	@echo "Environment OK."
 
@@ -378,16 +476,15 @@ help:
 	@echo "Green Threads Build System"
 	@echo ""
 	@echo "Build Targets"
-	@echo "  all              Build library, tests, examples, benchmarks"
-	@echo "  lib              Build static library only"
-	@echo "  tests            Build test executables"
+	@echo "  all              Build library, tests, examples"
+	@echo "  libs             Build static libraries only"
+	@echo "  unit             Build unit test executables"
+	@echo "  tests            Build all test executables"
 	@echo "  examples         Build example executables"
-	@echo "  benchmarks       Build benchmark executables"
 	@echo ""
 	@echo "Run Targets"
 	@echo "  run-tests        Execute test suite"
 	@echo "  run-examples     Run example programs"
-	@echo "  run-benchmarks   Run benchmark programs"
 	@echo ""
 	@echo "Quality Targets"
 	@echo "  check            Run lint + tests"
@@ -401,4 +498,12 @@ help:
 	@echo ""
 	@echo "  help             Show this help message\n"
 
--include $(DEPS)
+
+# ============================================================================
+# Dependency Files
+# ============================================================================
+
+-include $(RUNTIME_DEPS)
+-include $(TEST_SUPPORT_DEPS)
+-include $(UNIT_TEST_DEPS)
+-include $(EXAMPLE_DEPS)
