@@ -1,11 +1,6 @@
 #pragma once
 
 /**
- * @brief Forcefully silences compiler diagnostics for intentionally unreferenced tokens.
- */
-#define GT_UNUSED(x) ((void)(x))
-
-/**
  * @brief Begins a safe multi-statement macro expansion.
  */
 #define GT_MACRO_BEGIN \

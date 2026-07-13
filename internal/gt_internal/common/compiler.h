@@ -7,6 +7,12 @@
 #if defined(__clang__) || defined(__GNUC__)
 
 /**
+ * @brief Instructs the compiler to suppress unused warning flags for variables
+ *        or parameters primarily dedicated to diagnostic assertions.
+ */
+#define GT_MAYBE_UNUSED  __attribute__((unused))
+
+/**
  * @brief Marks a condition as likely to evaluate to true.
  */
 #define GT_LIKELY(x) __builtin_expect(!!(x), 1)
