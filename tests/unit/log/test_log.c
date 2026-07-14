@@ -6,8 +6,8 @@
 
 #define GT_LOG_COMPONENT "test"
 
-#include <gt_internal/log/log.h>
 #include <gt_internal/common/compiler.h>
+#include <gt_internal/log/log.h>
 
 static void
 emit_log(void)
@@ -16,13 +16,11 @@ emit_log(void)
 }
 
 static void
-verify_log(const char *output)
+verify_log(const char *GT_MAYBE_UNUSED output)
 {
     assert(strstr(output, "INFO"));
     assert(strstr(output, "test"));
     assert(strstr(output, "runtime initialized"));
-
-    GT_UNUSED(output);
 }
 
 int

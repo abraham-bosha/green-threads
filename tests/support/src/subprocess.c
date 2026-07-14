@@ -15,7 +15,7 @@ read_all(int fd, char *buffer, size_t size);
 void
 verify_process_aborts(void (*func)(void))
 {
-    pid_t pid = fork();
+    pid_t __attribute__((unused)) pid = fork();
 
     assert(pid >= 0);
 
@@ -27,11 +27,9 @@ verify_process_aborts(void (*func)(void))
         _exit(EXIT_FAILURE);
     }
 
-    int status;
+    int __attribute__((unused)) status;
 
-    __attribute__((unused)) pid_t reaped_pid = waitpid(pid, &status, 0);
-
-    assert(reaped_pid == pid);
+    assert(waitpid(pid, &status, 0) == pid);
 
     assert(WIFSIGNALED(status));
     assert(WTERMSIG(status) == SIGABRT);
@@ -42,9 +40,10 @@ verify_process_output(void (*func)(void), void (*verify)(const char *output))
 {
     char output[OUTPUT_BUFFER_SIZE];
     int pipefds[2];
-    __attribute__((unused)) int status;
+
+    int __attribute__((unused)) status;
     ssize_t bytes_read;
-    __attribute__((unused)) int result;
+    int __attribute__((unused)) result;
 
     result = pipe(pipefds);
     assert(result == 0);

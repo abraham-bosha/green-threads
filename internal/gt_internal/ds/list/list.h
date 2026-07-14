@@ -61,10 +61,7 @@ struct gt_list
  * @pre node is not currently linked into another list.
  */
 static GT_FORCE_INLINE void
-__gt_list_link(
-    struct gt_list_node *node,
-    struct gt_list_node *prev,
-    struct gt_list_node *next)
+__gt_list_link(struct gt_list_node *node, struct gt_list_node *prev, struct gt_list_node *next)
 {
     next->prev = node;
     node->next = next;
@@ -153,10 +150,8 @@ gt_list_back(const struct gt_list *list)
 /**
  * @brief Inserts an isolated node immediately before another target node.
  */
-static GT_FORCE_INLINE void 
-gt_list_insert_before(
-    struct gt_list_node *pos,
-    struct gt_list_node *node)
+static GT_FORCE_INLINE void
+gt_list_insert_before(struct gt_list_node *pos, struct gt_list_node *node)
 {
     __gt_list_link(node, pos->prev, pos);
 }
@@ -164,10 +159,8 @@ gt_list_insert_before(
 /**
  * @brief Inserts an isolated node immediately after another target node.
  */
-static GT_FORCE_INLINE void 
-gt_list_insert_after(
-    struct gt_list_node *pos,
-    struct gt_list_node *node)
+static GT_FORCE_INLINE void
+gt_list_insert_after(struct gt_list_node *pos, struct gt_list_node *node)
 {
     __gt_list_link(node, pos, pos->next);
 }
@@ -176,9 +169,7 @@ gt_list_insert_after(
  * @brief Inserts an isolated node at the absolute front of the list (LIFO).
  */
 static GT_FORCE_INLINE void
-gt_list_push_front(
-    struct gt_list *list,
-    struct gt_list_node *node)
+gt_list_push_front(struct gt_list *list, struct gt_list_node *node)
 {
     gt_list_insert_after(&list->head, node);
 }
@@ -187,9 +178,7 @@ gt_list_push_front(
  * @brief Inserts an isolated node at the absolute back of the list (FIFO).
  */
 static GT_FORCE_INLINE void
-gt_list_push_back(
-    struct gt_list *list,
-    struct gt_list_node *node)
+gt_list_push_back(struct gt_list *list, struct gt_list_node *node)
 {
     gt_list_insert_before(&list->head, node);
 }
@@ -206,10 +195,8 @@ gt_list_remove(struct gt_list_node *node)
 /**
  * @brief Moves an active linked node to the absolute front of the target list.
  */
-static GT_FORCE_INLINE void 
-gt_list_move_front(
-    struct gt_list *list,
-    struct gt_list_node *node)
+static GT_FORCE_INLINE void
+gt_list_move_front(struct gt_list *list, struct gt_list_node *node)
 {
     __gt_list_unlink(node);
     gt_list_push_front(list, node);
@@ -219,9 +206,7 @@ gt_list_move_front(
  * @brief Moves an active linked node to the absolute back of the target list.
  */
 static GT_FORCE_INLINE void
-gt_list_move_back(
-    struct gt_list *list,
-    struct gt_list_node *node)
+gt_list_move_back(struct gt_list *list, struct gt_list_node *node)
 {
     __gt_list_unlink(node);
     gt_list_push_back(list, node);
@@ -232,10 +217,8 @@ gt_list_move_back(
  * @param pos  The moving cursor tracking pointer variable.
  * @param list The pointer to the target master gt_list container.
  */
-#define GT_LIST_FOR_EACH(pos, list)                                    \
-    for ((pos) = (list)->head.next;                                    \
-         (pos) != &(list)->head;                                       \
-         (pos) = (pos)->next)
+#define GT_LIST_FOR_EACH(pos, list) \
+    for ((pos) = (list)->head.next; (pos) != &(list)->head; (pos) = (pos)->next)
 
 /**
  * @brief Iterates safely forward while allowing the current node to be removed.
@@ -243,9 +226,8 @@ gt_list_move_back(
  * @param nxt  The temporary safety cursor variable to cache the next node step.
  * @param list The pointer to the target master gt_list container.
  */
-#define GT_LIST_FOR_EACH_SAFE(pos, nxt, list)                          \
-    for ((pos) = (list)->head.next, (nxt) = (pos)->next;               \
-         (pos) != &(list)->head;                                       \
+#define GT_LIST_FOR_EACH_SAFE(pos, nxt, list)                                    \
+    for ((pos) = (list)->head.next, (nxt) = (pos)->next; (pos) != &(list)->head; \
          (pos) = (nxt), (nxt) = (pos)->next)
 
 /**
@@ -254,8 +236,7 @@ gt_list_move_back(
  * @param list   The pointer to the target master gt_list container.
  * @param member The literal variable name of the embedded structural node field.
  */
-#define GT_LIST_FOR_EACH_ENTRY(pos, list, member)                      \
-    for (struct gt_list_node *__curr = (list)->head.next;              \
-         (__curr != &(list)->head) &&                                  \
-         (((pos) = GT_CONTAINER_OF(__curr, typeof(*(pos)), member)), true); \
+#define GT_LIST_FOR_EACH_ENTRY(pos, list, member)                                      \
+    for (struct gt_list_node *__curr = (list)->head.next; (__curr != &(list)->head) && \
+         (((pos) = GT_CONTAINER_OF(__curr, typeof(*(pos)), member)), true);            \
          __curr = __curr->next)

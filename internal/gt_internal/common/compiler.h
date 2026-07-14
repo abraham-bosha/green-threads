@@ -10,7 +10,7 @@
  * @brief Instructs the compiler to suppress unused warning flags for variables
  *        or parameters primarily dedicated to diagnostic assertions.
  */
-#define GT_MAYBE_UNUSED  __attribute__((unused))
+#define GT_MAYBE_UNUSED __attribute__((unused))
 
 /**
  * @brief Marks a condition as likely to evaluate to true.

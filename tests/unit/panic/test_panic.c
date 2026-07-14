@@ -1,13 +1,8 @@
-#include <subprocess.h>
-
 #include <gt_internal/panic/panic.h>
 
-#include <assert.h>
-#include <signal.h>
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
+
+#include <subprocess.h>
 
 void
 test_panic(void)
@@ -18,11 +13,11 @@ test_panic(void)
 int
 main(void)
 {
-    puts("[RUN] panic/panic");
+    puts("[RUN] panic");
 
     verify_process_aborts(test_panic);
 
-    puts("[PASS] panic/panic");
+    puts("[PASS] panic");
 
     return 0;
 }

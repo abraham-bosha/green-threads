@@ -11,7 +11,6 @@ test_power_of_two_alignment_up(void)
     assert(GT_ALIGN_UP_POT(4, 16) == 16);
     assert(GT_ALIGN_UP_POT(15, 16) == 16);
 
-    /* Page-size boundaries (4096) */
     assert(GT_ALIGN_UP_POT(1, GT_PAGE_SIZE) == 4096);
     assert(GT_ALIGN_UP_POT(4095, GT_PAGE_SIZE) == 4096);
     assert(GT_ALIGN_UP_POT(4097, GT_PAGE_SIZE) == 8192);

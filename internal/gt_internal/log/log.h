@@ -45,13 +45,14 @@ typedef enum
  * Runtime code should use GT_LOG_* macros instead.
  */
 GT_PRINTF_FORMAT(6, 7)
-void gt_log(gt_log_level_t level,
-            const char *component,
-            const char *file,
-            int line,
-            const char *function,
-            const char *format,
-            ...);
+void
+gt_log(gt_log_level_t level,
+       const char *component,
+       const char *file,
+       int line,
+       const char *function,
+       const char *format,
+       ...);
 
 /* Logging Dispatch */
 

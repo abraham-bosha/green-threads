@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <gt_internal/common/compiler.h>
+
 /*
  * Version subsystem contract test.
  *
@@ -13,12 +15,6 @@
  *
  * Ensures no mismatch between headers and linked library.
  */
-
-extern const char *
-gt_version_string(void);
-
-extern uint32_t
-gt_version_number(void);
 
 static void
 test_compile_time(void)
@@ -36,7 +32,7 @@ test_runtime(void)
 {
     assert(strcmp(gt_version_string(), "1.0.0") == 0);
 
-    __attribute__((unused)) uint32_t v = gt_version_number();
+    uint32_t GT_MAYBE_UNUSED v = gt_version_number();
     assert(v == 10000);
     assert(v == GT_VERSION_NUMBER);
 }
@@ -50,5 +46,6 @@ main(void)
     test_runtime();
 
     printf("[PASS] runtime/version\n");
+
     return 0;
 }

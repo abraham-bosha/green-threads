@@ -34,5 +34,4 @@
  * @brief Casts a pointer to a nested structural element back into a pointer to its parent enclosure
  * container.
  */
-#define GT_CONTAINER_OF(ptr, type, member) \
-    ((type *)((char *)(ptr) - offsetof(type, member)))
+#define GT_CONTAINER_OF(ptr, type, member) ((type *)((char *)(ptr) - offsetof(type, member)))

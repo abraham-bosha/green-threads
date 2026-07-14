@@ -1,9 +1,9 @@
-#include <subprocess.h>
-
 #include <gt_internal/assert/assert.h>
 
 #include <stdbool.h>
 #include <stdio.h>
+
+#include <subprocess.h>
 
 static inline void
 test_assert_succeeds(void)
@@ -32,7 +32,7 @@ test_assert_msg_fails(void)
 int
 main(void)
 {
-    puts("[RUN] assert/assert");
+    puts("[RUN] assert");
 
     test_assert_succeeds();
     test_assert_msg_succeeds();
@@ -40,7 +40,7 @@ main(void)
     verify_process_aborts(test_assert_fails);
     verify_process_aborts(test_assert_msg_fails);
 
-    puts("[PASS] assert/assert");
+    puts("[PASS] assert");
 
     return 0;
 }

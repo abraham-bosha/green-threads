@@ -31,10 +31,9 @@ struct list_test_context
  * @brief Asserts the precise topological placement of an active node link.
  */
 static void
-verify_links(
-    const struct gt_list_node * GT_MAYBE_UNUSED node,
-    const struct gt_list_node * GT_MAYBE_UNUSED expected_prev,
-    const struct gt_list_node * GT_MAYBE_UNUSED expected_next)
+verify_links(const struct gt_list_node *GT_MAYBE_UNUSED node,
+             const struct gt_list_node *GT_MAYBE_UNUSED expected_prev,
+             const struct gt_list_node *GT_MAYBE_UNUSED expected_next)
 {
     assert(node->prev == expected_prev);
     assert(node->next == expected_next);
@@ -191,10 +190,11 @@ test_iteration_macro(void)
 
     struct gt_list_node *pos;
     int GT_MAYBE_UNUSED expected_id = 101;
-    
+
     GT_LIST_FOR_EACH(pos, &ctx.list)
     {
-        struct mock_thread * GT_MAYBE_UNUSED task = GT_CONTAINER_OF(pos, struct mock_thread, link);
+        const struct mock_thread *GT_MAYBE_UNUSED task =
+            GT_CONTAINER_OF(pos, struct mock_thread, link);
         assert(task->thread_id == expected_id);
         expected_id++;
     }
@@ -215,7 +215,8 @@ test_safe_iteration_macro(void)
 
     GT_LIST_FOR_EACH_SAFE(pos, nxt, &ctx.list)
     {
-        struct mock_thread * GT_MAYBE_UNUSED task = GT_CONTAINER_OF(pos, struct mock_thread, link);
+        const struct mock_thread *GT_MAYBE_UNUSED task =
+            GT_CONTAINER_OF(pos, struct mock_thread, link);
         if (task->thread_id == 102)
         {
             gt_list_remove(pos);
@@ -268,5 +269,6 @@ main(void)
     test_entry_iteration_macro();
 
     puts("[PASS] ds/list");
+
     return 0;
 }
