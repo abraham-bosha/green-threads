@@ -15,3 +15,9 @@ build/
 core
 vgcore.*
 *.core
+
+# Vim and Neovim temporary swap files
+.*.swp
+.*.swo
+.swp
+.swo
