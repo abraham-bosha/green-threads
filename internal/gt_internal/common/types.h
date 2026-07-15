@@ -67,6 +67,9 @@ struct gt_stack;
 struct gt_memory;
 
 /* Internal data structures */
+struct gt_list;
+struct gt_list_node;
+struct gt_queue;
 struct gt_bitmap;
-struct gt_run_queue;
 struct gt_id_pool;
+struct gt_run_queue;
