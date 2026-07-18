@@ -18,9 +18,9 @@ gt_panic(const char *file, int line, const char *function, const char *message)
 
     fprintf(stderr, "   | Function : %s\n", function ? function : "<unknown>");
 
-    fprintf(stderr, "   | Line     : %d\n\n", line);
+    fprintf(stderr, "   | Line     : %d\n", line);
 
-    fprintf(stderr, "   | Aborting...\n");
+    fprintf(stderr, "   | Aborting...\n\n");
 
     fflush(stderr);
 
