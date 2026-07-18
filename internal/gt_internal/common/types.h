@@ -61,6 +61,7 @@ struct gt_runtime;
 struct gt_scheduler;
 struct gt_task;
 struct gt_context;
+struct gt_vm_mapping;
 
 /* Memory subsystem */
 struct gt_stack;
