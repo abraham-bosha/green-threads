@@ -7,7 +7,7 @@ gt_status_string(gt_status_t status)
     {
             /*
              * =========================================================================
-             * Generic Status Codes
+             * Generic Status Codes (0 - 99)
              * =========================================================================
              */
 
@@ -55,6 +55,24 @@ gt_status_string(gt_status_t status)
 
         case GT_STATUS_TASK_NOT_FOUND:
             return "task not found";
+
+            /*
+             * =========================================================================
+             * Platform Status Codes (600 - 699)
+             * =========================================================================
+             */
+
+        case GT_STATUS_VM_RESERVATION_FAILED:
+            return "vm mapping reservation failed";
+
+        case GT_STATUS_VM_PROTECTION_FAILED:
+            return "vm mapping protection failed";
+
+        case GT_STATUS_VM_RELEASE_FAILED:
+            return "vm mapping release failed";
+
+        case GT_STATUS_PAGE_SIZE_UNAVAILABLE:
+            return "page size unavailable";
 
             /*
              * =========================================================================
