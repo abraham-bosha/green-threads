@@ -28,42 +28,6 @@ Defines the common semantic types shared across the runtime. It serves as the pr
 - Runtime objects must remain opaque.
 - Implementation details must never be exposed.
 
-## Public Interface
-
-### Semantic Types
-
-- `gt_task_id_t`
-- `gt_addr_t`
-
-### Enumerations
-
-- `gt_task_state_t`
-- `gt_runtime_state_t`
-- `gt_backend_type_t`
-
-### Callback Types
-
-- `gt_task_entry_fn`
-
-### Opaque Objects
-
-- `struct gt_runtime`
-- `struct gt_scheduler`
-- `struct gt_task`
-- `struct gt_context`
-- `struct gt_stack`
-- `struct gt_memory`
-- `struct gt_bitmap`
-- `struct gt_run_queue`
-- `struct gt_list`
-- `struct gt_id_pool`
-
-## Dependencies
-
-- `<stdbool.h>`
-- `<stddef.h>`
-- `<stdint.h>`
-
 ---
 
 # Module: `macros.h`
@@ -130,19 +94,39 @@ Provides compile-time bit manipulation primitives and bit-related constants.
 
 ## Purpose
 
-Provides common memory constants and memory size helpers.
+The mem module provides common memory operations used throughout the runtime.
+
+It offers small, reusable abstractions over standard C memory primitives while keeping the runtime independent of direct C library usage.
+
+---
 
 ## Responsibilities
 
-- Define memory size conversion macros.
-- Define shared memory constants.
-- Centralize architecture-independent memory values.
+The Memory Utilities module shall:
 
-## Invariants
+- Provide common memory operations.
+- Expose lightweight runtime memory helpers.
+- Hide direct use of C standard library memory functions where appropriate.
 
-- Independent of every internal module.
-- Entirely compile-time.
-- Contains only architectural memory definitions.
+---
+
+## Non-Responsibilities
+
+The Memory Utilities module shall not:
+
+- Allocate memory.
+- Manage virtual memory.
+- Manage runtime stacks.
+- Provide platform-specific memory functionality.
+
+---
+
+## Relationships
+
+The Memory Utilities module depends on:
+
+- Common
+- C Standard Library
 
 ---
 
@@ -199,3 +183,7 @@ The Common module must never depend on:
 - Zero runtime initialization.
 - Compile-time evaluation whenever possible.
 - No hidden runtime overhead.
+
+---
+
+End of Document
