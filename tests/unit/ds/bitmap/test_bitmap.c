@@ -31,7 +31,7 @@ test_bitmap_init(void)
 
     /* Verify layout calculations match cached structural metrics */
     assert(ctx.bitmap.total_bits == 75);
-    assert(ctx.bitmap.word_count == 2);
+    assert(ctx.bitmap.total_words == 2);
 
     /* Verify core boolean query states */
     assert(gt_bitmap_is_empty(&ctx.bitmap) == true);

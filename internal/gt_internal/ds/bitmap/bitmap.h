@@ -10,10 +10,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#include <gt_internal/common/bits.h>
 #include <gt_internal/common/compiler.h>
-
-/* Number of bits stored in one machine word. */
-#define GT_BITMAP_BITS_PER_WORD (sizeof(unsigned long) * CHAR_BIT)
+#include <gt_internal/common/mem.h>
 
 /**
  * @brief Caller-owned bitmap.
@@ -24,7 +23,7 @@ struct gt_bitmap
 {
     unsigned long *words;
     size_t total_bits;
-    size_t word_count;
+    size_t total_words;
 };
 
 /* -------------------------------------------------------------------------- */
@@ -34,13 +33,13 @@ struct gt_bitmap
 static GT_FORCE_INLINE size_t
 __gt_bitmap_word_index(size_t bit_index)
 {
-    return bit_index / GT_BITMAP_BITS_PER_WORD;
+    return bit_index / GT_BITS_PER_WORD;
 }
 
 static GT_FORCE_INLINE unsigned int
 __gt_bitmap_bit_offset(size_t bit_index)
 {
-    return bit_index % GT_BITMAP_BITS_PER_WORD;
+    return bit_index % GT_BITS_PER_WORD;
 }
 
 static GT_FORCE_INLINE unsigned long
@@ -52,7 +51,7 @@ __gt_bitmap_bit_mask(unsigned int bit_offset)
 static GT_FORCE_INLINE size_t
 __gt_bitmap_total_words(size_t total_bits)
 {
-    return (total_bits + GT_BITMAP_BITS_PER_WORD - 1UL) / GT_BITMAP_BITS_PER_WORD;
+    return (total_bits + GT_BITS_PER_WORD - 1UL) / GT_BITS_PER_WORD;
 }
 
 static GT_FORCE_INLINE unsigned long
@@ -111,12 +110,14 @@ gt_bitmap_init(struct gt_bitmap *b, unsigned long *words, size_t total_bits)
     __gt_bitmap_validate_storage(words);
     __gt_bitmap_validate_total_bits(total_bits);
 
+    size_t total_words;
+    total_words = __gt_bitmap_total_words(total_bits);
+
     b->words = words;
     b->total_bits = total_bits;
-    b->word_count = __gt_bitmap_total_words(total_bits);
+    b->total_words = total_words;
 
-    for (size_t i = 0; i < b->word_count; i++)
-        b->words[i] = 0UL;
+    gt_mem_zero(words, sizeof(*words) * total_words);
 }
 
 static GT_FORCE_INLINE bool
@@ -125,7 +126,7 @@ gt_bitmap_is_empty(const struct gt_bitmap *b)
     __gt_bitmap_validate(b);
     __gt_bitmap_validate_storage(b->words);
 
-    for (size_t i = 0; i < b->word_count; i++)
+    for (size_t i = 0; i < b->total_words; i++)
     {
         if (b->words[i] != 0UL)
         {
@@ -142,11 +143,11 @@ gt_bitmap_is_full(const struct gt_bitmap *b)
     __gt_bitmap_validate(b);
     __gt_bitmap_validate_storage(b->words);
 
-    size_t full_word_count = b->total_bits / GT_BITMAP_BITS_PER_WORD;
+    size_t full_total_words = b->total_bits / GT_BITS_PER_WORD;
 
-    bool has_partial_word = (b->word_count > full_word_count);
+    bool has_partial_word = b->total_words > full_total_words;
 
-    for (size_t i = 0; i < full_word_count; i++)
+    for (size_t i = 0; i < full_total_words; i++)
     {
         if (b->words[i] != ~0UL)
         {
@@ -157,7 +158,7 @@ gt_bitmap_is_full(const struct gt_bitmap *b)
     if (has_partial_word)
     {
         unsigned long partial_word_mask = __gt_bitmap_last_word_mask(b->total_bits);
-        if (b->words[full_word_count] != partial_word_mask)
+        if (b->words[full_total_words] != partial_word_mask)
         {
             return false;
         }
@@ -227,12 +228,9 @@ gt_bitmap_set_all(struct gt_bitmap *b)
     __gt_bitmap_validate(b);
     __gt_bitmap_validate_storage(b->words);
 
-    for (size_t i = 0; i < b->word_count; i++)
-    {
-        b->words[i] = ~0UL;
-    }
+    gt_mem_fill_ones(b->words, sizeof(*b->words) * b->total_words);
 
-    b->words[b->word_count - 1] &= __gt_bitmap_last_word_mask(b->total_bits);
+    b->words[b->total_words - 1] &= __gt_bitmap_last_word_mask(b->total_bits);
 }
 
 static GT_FORCE_INLINE void
@@ -241,10 +239,7 @@ gt_bitmap_clear_all(struct gt_bitmap *b)
     __gt_bitmap_validate(b);
     __gt_bitmap_validate_storage(b->words);
 
-    for (size_t i = 0; i < b->word_count; i++)
-    {
-        b->words[i] = 0UL;
-    }
+    gt_mem_zero(b->words, sizeof(*b->words) * b->total_words);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -263,12 +258,12 @@ gt_bitmap_find_first_set(const struct gt_bitmap *b, size_t *out_bit_index)
     __gt_bitmap_validate_storage(b->words);
     __gt_bitmap_validate_out_bit_index(out_bit_index);
 
-    for (size_t i = 0; i < b->word_count; i++)
+    for (size_t i = 0; i < b->total_words; i++)
     {
         if (b->words[i] != 0UL)
         {
             size_t bit_index = __builtin_ctzl(b->words[i]);
-            *out_bit_index = (i * GT_BITMAP_BITS_PER_WORD) + bit_index;
+            *out_bit_index = (i * GT_BITS_PER_WORD) + bit_index;
             return true;
         }
     }
@@ -292,11 +287,11 @@ gt_bitmap_find_first_clear(const struct gt_bitmap *b, size_t *out_bit_index)
 
     partial_word_mask = __gt_bitmap_last_word_mask(b->total_bits);
 
-    for (size_t i = 0; i < b->word_count; i++)
+    for (size_t i = 0; i < b->total_words; i++)
     {
         unsigned long inverted_word = ~b->words[i];
 
-        if (i == b->word_count - 1)
+        if (i == b->total_words - 1)
         {
             inverted_word &= partial_word_mask;
         }
@@ -304,7 +299,7 @@ gt_bitmap_find_first_clear(const struct gt_bitmap *b, size_t *out_bit_index)
         if (inverted_word != 0UL)
         {
             size_t bit_index = (size_t)__builtin_ctzl(inverted_word);
-            *out_bit_index = (i * GT_BITMAP_BITS_PER_WORD) + bit_index;
+            *out_bit_index = (i * GT_BITS_PER_WORD) + bit_index;
             return true;
         }
     }
