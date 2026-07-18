@@ -1,7 +1,6 @@
 #pragma once
 
 #include <limits.h>
-#include <stdint.h>
 
 /**
  * @brief Foundational bitwise widths and primitive hardware mask generators.
@@ -13,17 +12,11 @@
 #define GT_BITS_PER_BYTE CHAR_BIT
 
 /**
- * @brief The physical number of bits contained within a single 64-bit storage word.
- *        Directly establishes the internal block element width for the ds/bitmap system.
+ * @brief The number of bits contained within a native storage word.
+ *
+ * Defines the internal block width used by bitmap storage.
  */
-#define GT_BITS_PER_WORD (sizeof(uint64_t) * GT_BITS_PER_BYTE)
-
-/**
- * @brief Generates an isolated, architecture-agnostic 64-bit unsigned bitmask
- *        containing a single active '1' at the requested position.
- * @param pos The bit target offset index position (MUST sit strictly between 0 and 63).
- */
-#define GT_BIT64(pos) (UINT64_C(1) << (pos))
+#define GT_BITS_PER_WORD (sizeof(unsigned long) * GT_BITS_PER_BYTE)
 
 /**
  * @brief Compile-time predicate evaluating whether a non-zero integer is a perfect power of two.
