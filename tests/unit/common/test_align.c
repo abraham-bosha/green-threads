@@ -11,9 +11,9 @@ test_power_of_two_alignment_up(void)
     assert(GT_ALIGN_UP_POT(4, 16) == 16);
     assert(GT_ALIGN_UP_POT(15, 16) == 16);
 
-    assert(GT_ALIGN_UP_POT(1, GT_PAGE_SIZE) == 4096);
-    assert(GT_ALIGN_UP_POT(4095, GT_PAGE_SIZE) == 4096);
-    assert(GT_ALIGN_UP_POT(4097, GT_PAGE_SIZE) == 8192);
+    assert(GT_ALIGN_UP_POT(1, 4096) == 4096);
+    assert(GT_ALIGN_UP_POT(4095, 4096) == 4096);
+    assert(GT_ALIGN_UP_POT(4097, 4096) == 8192);
 }
 
 void
@@ -31,13 +31,13 @@ test_power_of_two_alignment_down(void)
 void
 test_arbitrary_alignment_any(void)
 {
-    assert(GT_ROUND_UP_ANY(0, 6) == 0);
-    assert(GT_ROUND_UP_ANY(4, 6) == 6);
-    assert(GT_ROUND_UP_ANY(6, 6) == 6);
+    assert(GT_ALIGN_UP_ANY(0, 6) == 0);
+    assert(GT_ALIGN_UP_ANY(4, 6) == 6);
+    assert(GT_ALIGN_UP_ANY(6, 6) == 6);
 
-    assert(GT_ROUND_DOWN_ANY(4, 6) == 0);
-    assert(GT_ROUND_DOWN_ANY(6, 6) == 6);
-    assert(GT_ROUND_DOWN_ANY(11, 6) == 6);
+    assert(GT_ALIGN_DOWN_ANY(4, 6) == 0);
+    assert(GT_ALIGN_DOWN_ANY(6, 6) == 6);
+    assert(GT_ALIGN_DOWN_ANY(11, 6) == 6);
 }
 
 void
@@ -61,6 +61,5 @@ main(void)
     test_alignment_predicate();
 
     puts("[PASS] common/align");
-
     return 0;
 }
