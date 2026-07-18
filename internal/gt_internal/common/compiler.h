@@ -72,6 +72,8 @@
 
 #else
 
+#define GT_MAYBE_UNUSED
+
 #define GT_LIKELY(x) (x)
 #define GT_UNLIKELY(x) (x)
 
