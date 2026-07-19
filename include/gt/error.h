@@ -21,10 +21,10 @@ typedef enum
      * Generic failures.
      */
     GT_STATUS_INVALID_ARGUMENT = 1,
-    GT_STATUS_INVALID_STATE    = 2,
-    GT_STATUS_OUT_OF_MEMORY    = 3,
-    GT_STATUS_UNSUPPORTED      = 4,
-    GT_STATUS_INTERNAL_ERROR   = 5,
+    GT_STATUS_INVALID_STATE = 2,
+    GT_STATUS_OUT_OF_MEMORY = 3,
+    GT_STATUS_UNSUPPORTED = 4,
+    GT_STATUS_INTERNAL_ERROR = 5,
 
     /*
      * =========================================================================
@@ -33,8 +33,8 @@ typedef enum
      */
 
     GT_STATUS_RUNTIME_ALREADY_INITIALIZED = 100,
-    GT_STATUS_RUNTIME_NOT_INITIALIZED     = 101,
-    GT_STATUS_RUNTIME_RUNNING             = 102,
+    GT_STATUS_RUNTIME_NOT_INITIALIZED = 101,
+    GT_STATUS_RUNTIME_RUNNING = 102,
 
     /*
      * =========================================================================
@@ -43,7 +43,7 @@ typedef enum
      */
 
     GT_STATUS_TASK_LIMIT_REACHED = 200,
-    GT_STATUS_TASK_NOT_FOUND     = 201,
+    GT_STATUS_TASK_NOT_FOUND = 201,
 
     /*
      * =========================================================================
@@ -83,8 +83,8 @@ typedef enum
     GT_STATUS_PAGE_SIZE_UNAVAILABLE = 603,
 
     GT_STATUS_VM_RESERVATION_FAILED = 600,
-    GT_STATUS_VM_PROTECTION_FAILED  = 601,
-    GT_STATUS_VM_RELEASE_FAILED     = 602,
+    GT_STATUS_VM_PROTECTION_FAILED = 601,
+    GT_STATUS_VM_RELEASE_FAILED = 602,
 
 } gt_status_t;
 
