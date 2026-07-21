@@ -18,6 +18,5 @@ main(void)
     verify_process_aborts(test_panic);
 
     puts("[PASS] panic");
-
     return 0;
 }

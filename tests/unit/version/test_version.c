@@ -46,6 +46,5 @@ main(void)
     test_runtime();
 
     printf("[PASS] runtime/version\n");
-
     return 0;
 }

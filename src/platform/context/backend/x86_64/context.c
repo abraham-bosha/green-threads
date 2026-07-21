@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include <gt/error.h>
+
 #include <gt_internal/assert/assert.h>
 #include <gt_internal/common/align.h>
 #include <gt_internal/common/compiler.h>

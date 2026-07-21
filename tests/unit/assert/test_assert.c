@@ -14,7 +14,7 @@ test_assert_succeeds(void)
 static inline void
 test_assert_msg_succeeds(void)
 {
-    GT_ASSERT_MSG(1 == 1, "should never have be printed");
+    GT_ASSERT_MSG(1 == 1, "Identity invariant evaluation failed");
 }
 
 static void
@@ -41,6 +41,5 @@ main(void)
     verify_process_aborts(test_assert_msg_fails);
 
     puts("[PASS] assert");
-
     return 0;
 }

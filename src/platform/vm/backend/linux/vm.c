@@ -2,11 +2,13 @@
  * @file vm.c
  * @brief Linux implementation of the platform virtual memory interface.
  */
-#include <assert.h>
 #include <errno.h>
 #include <stdint.h>
 #include <sys/mman.h>
 
+#include <gt/error.h>
+
+#include <gt_internal/assert/assert.h>
 #include <gt_internal/common/compiler.h>
 #include <gt_internal/common/macros.h>
 #include <gt_internal/platform/page/page.h>
@@ -17,29 +19,29 @@
 /* -------------------------------------------------------------------------- */
 
 static GT_FORCE_INLINE void
-__gt_vm_mapping_validate(const struct gt_vm_mapping *GT_MAYBE_UNUSED m)
+__gt_vm_mapping_validate_mapping(const struct gt_vm_mapping *GT_MAYBE_UNUSED m)
 {
-    assert(m != NULL);
+    GT_ASSERT(m != NULL);
 }
 
 static GT_FORCE_INLINE void
 __gt_vm_mapping_validate_alignment(const void *GT_MAYBE_UNUSED base)
 {
-    assert(base != NULL);
-    assert(gt_page_is_aligned(base));
+    GT_ASSERT(base != NULL);
+    GT_ASSERT(gt_page_is_aligned(base));
 }
 
 static GT_FORCE_INLINE void
 __gt_vm_mapping_validate_size(size_t GT_MAYBE_UNUSED size)
 {
-    assert(size > 0UL);
-    assert(gt_page_is_size_aligned(size));
+    GT_ASSERT(size > 0UL);
+    GT_ASSERT(gt_page_is_size_aligned(size));
 }
 
 static GT_FORCE_INLINE void
 __gt_vm_mapping_validate_access(gt_vm_access_t GT_MAYBE_UNUSED access)
 {
-    assert(false && "Unsupported virtual memory access mode.");
+     GT_ASSERT_MSG(false, "Unsupported virtual memory access mode.");
 }
 
 /* -------------------------------------------------------------------------- */
@@ -52,7 +54,7 @@ __gt_vm_mapping_validate_access(gt_vm_access_t GT_MAYBE_UNUSED access)
 static GT_FORCE_INLINE void
 __gt_vm_mapping_reset(struct gt_vm_mapping *m)
 {
-    __gt_vm_mapping_validate(m);
+    __gt_vm_mapping_validate_mapping(m);
 
     m->base = NULL;
     m->size = 0UL;
@@ -87,7 +89,7 @@ __gt_vm_mapping_translate_access(gt_vm_access_t access)
 gt_status_t
 gt_vm_mapping_reserve(struct gt_vm_mapping *m, size_t size)
 {
-    __gt_vm_mapping_validate(m);
+    __gt_vm_mapping_validate_mapping(m);
     __gt_vm_mapping_validate_size(size);
 
     void *base;
@@ -118,7 +120,7 @@ gt_vm_mapping_reserve(struct gt_vm_mapping *m, size_t size)
 gt_status_t
 gt_vm_mapping_protect(const struct gt_vm_mapping *m, gt_vm_access_t access)
 {
-    __gt_vm_mapping_validate(m);
+    __gt_vm_mapping_validate_mapping(m);
     __gt_vm_mapping_validate_alignment(m->base);
     __gt_vm_mapping_validate_size(m->size);
 
@@ -138,7 +140,7 @@ gt_vm_mapping_protect(const struct gt_vm_mapping *m, gt_vm_access_t access)
 gt_status_t
 gt_vm_mapping_release(struct gt_vm_mapping *m)
 {
-    __gt_vm_mapping_validate(m);
+    __gt_vm_mapping_validate_mapping(m);
     __gt_vm_mapping_validate_alignment(m->base);
     __gt_vm_mapping_validate_size(m->size);
 

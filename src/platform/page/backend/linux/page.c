@@ -5,7 +5,6 @@
 
 #include <gt_internal/platform/page/page.h>
 
-#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -13,6 +12,7 @@
 
 #include <gt/error.h>
 
+#include <gt_internal/assert/assert.h>
 #include <gt_internal/common/align.h>
 #include <gt_internal/common/bits.h>
 #include <gt_internal/common/compiler.h>
@@ -32,25 +32,25 @@ static size_t __gt_page_max_alignable_size;
 static GT_FORCE_INLINE void
 __gt_page_validate_page_size(void)
 {
-    assert(GT_IS_POW2(__gt_page_size));
+    GT_ASSERT(GT_IS_POW2(__gt_page_size));
 }
 
 static GT_FORCE_INLINE void
 __gt_page_validate_initialized(void)
 {
-    assert(__gt_page_size_initialized);
+    GT_ASSERT(__gt_page_size_initialized);
 }
 
 static GT_FORCE_INLINE void
 __gt_page_validate_address(const void *GT_MAYBE_UNUSED address)
 {
-    assert(address != NULL);
+    GT_ASSERT(address != NULL);
 }
 
 static GT_FORCE_INLINE void
 __gt_page_validate_alignable_size(size_t GT_MAYBE_UNUSED size)
 {
-    assert(size <= __gt_page_max_alignable_size);
+    GT_ASSERT(size <= __gt_page_max_alignable_size);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -63,7 +63,9 @@ gt_page_init(void)
     // assert(!__gt_page_size_initialized);
 
     /* Discover the system page size from the operating system. */
-    long ps = sysconf(_SC_PAGE_SIZE);
+    long ps;
+
+    ps = sysconf(_SC_PAGE_SIZE);
 
     if (ps <= 0)
     {

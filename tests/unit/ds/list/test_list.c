@@ -269,6 +269,5 @@ main(void)
     test_entry_iteration_macro();
 
     puts("[PASS] ds/list");
-
     return 0;
 }

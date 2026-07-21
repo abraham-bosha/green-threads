@@ -35,6 +35,5 @@ main(void)
     test_status_string_mapping();
 
     printf("[PASS] runtime/error\n");
-
     return 0;
 }

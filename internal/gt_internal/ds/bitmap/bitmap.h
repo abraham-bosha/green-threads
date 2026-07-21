@@ -5,11 +5,11 @@
  * @brief Non-owning bitmap implementation.
  */
 
-#include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 
+#include <gt_internal/assert/assert.h>
 #include <gt_internal/common/bits.h>
 #include <gt_internal/common/compiler.h>
 #include <gt_internal/common/mem.h>
@@ -66,34 +66,34 @@ __gt_bitmap_last_word_mask(size_t total_bits)
 /* -------------------------------------------------------------------------- */
 
 static GT_FORCE_INLINE void
-__gt_bitmap_validate(const struct gt_bitmap *GT_MAYBE_UNUSED b)
+__gt_bitmap_validate_bitmap(const struct gt_bitmap *GT_MAYBE_UNUSED b)
 {
-    assert(b != NULL);
+    GT_ASSERT(b != NULL);
 }
 
 static GT_FORCE_INLINE void
 __gt_bitmap_validate_storage(const unsigned long *GT_MAYBE_UNUSED words)
 {
-    assert(words != NULL);
+    GT_ASSERT(words != NULL);
 }
 
 static GT_FORCE_INLINE void
 __gt_bitmap_validate_bit_index(const struct gt_bitmap *GT_MAYBE_UNUSED b,
                                size_t GT_MAYBE_UNUSED bit_index)
 {
-    assert(bit_index < b->total_bits);
+    GT_ASSERT(bit_index < b->total_bits);
 }
 
 static GT_FORCE_INLINE void
 __gt_bitmap_validate_total_bits(size_t GT_MAYBE_UNUSED total_bits)
 {
-    assert(total_bits > 0UL);
+    GT_ASSERT(total_bits > 0UL);
 }
 
 static GT_FORCE_INLINE void
 __gt_bitmap_validate_out_bit_index(const size_t *GT_MAYBE_UNUSED out_bit_index)
 {
-    assert(out_bit_index != NULL);
+    GT_ASSERT(out_bit_index != NULL);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -106,7 +106,7 @@ __gt_bitmap_validate_out_bit_index(const size_t *GT_MAYBE_UNUSED out_bit_index)
 static GT_FORCE_INLINE void
 gt_bitmap_init(struct gt_bitmap *b, unsigned long *words, size_t total_bits)
 {
-    __gt_bitmap_validate(b);
+    __gt_bitmap_validate_bitmap(b);
     __gt_bitmap_validate_storage(words);
     __gt_bitmap_validate_total_bits(total_bits);
 
@@ -123,7 +123,7 @@ gt_bitmap_init(struct gt_bitmap *b, unsigned long *words, size_t total_bits)
 static GT_FORCE_INLINE bool
 gt_bitmap_is_empty(const struct gt_bitmap *b)
 {
-    __gt_bitmap_validate(b);
+    __gt_bitmap_validate_bitmap(b);
     __gt_bitmap_validate_storage(b->words);
 
     for (size_t i = 0; i < b->total_words; i++)
@@ -140,7 +140,7 @@ gt_bitmap_is_empty(const struct gt_bitmap *b)
 static GT_FORCE_INLINE bool
 gt_bitmap_is_full(const struct gt_bitmap *b)
 {
-    __gt_bitmap_validate(b);
+    __gt_bitmap_validate_bitmap(b);
     __gt_bitmap_validate_storage(b->words);
 
     size_t full_total_words = b->total_bits / GT_BITS_PER_WORD;
@@ -170,7 +170,7 @@ gt_bitmap_is_full(const struct gt_bitmap *b)
 static GT_FORCE_INLINE bool
 gt_bitmap_test(const struct gt_bitmap *b, size_t bit_index)
 {
-    __gt_bitmap_validate(b);
+    __gt_bitmap_validate_bitmap(b);
     __gt_bitmap_validate_storage(b->words);
     __gt_bitmap_validate_bit_index(b, bit_index);
 
@@ -188,7 +188,7 @@ gt_bitmap_test(const struct gt_bitmap *b, size_t bit_index)
 static GT_FORCE_INLINE void
 gt_bitmap_set(struct gt_bitmap *b, size_t bit_index)
 {
-    __gt_bitmap_validate(b);
+    __gt_bitmap_validate_bitmap(b);
     __gt_bitmap_validate_storage(b->words);
     __gt_bitmap_validate_bit_index(b, bit_index);
 
@@ -202,7 +202,7 @@ gt_bitmap_set(struct gt_bitmap *b, size_t bit_index)
 static GT_FORCE_INLINE void
 gt_bitmap_clear(struct gt_bitmap *b, size_t bit_index)
 {
-    __gt_bitmap_validate(b);
+    __gt_bitmap_validate_bitmap(b);
     __gt_bitmap_validate_storage(b->words);
     __gt_bitmap_validate_bit_index(b, bit_index);
 
@@ -225,7 +225,7 @@ gt_bitmap_clear(struct gt_bitmap *b, size_t bit_index)
 static GT_FORCE_INLINE void
 gt_bitmap_set_all(struct gt_bitmap *b)
 {
-    __gt_bitmap_validate(b);
+    __gt_bitmap_validate_bitmap(b);
     __gt_bitmap_validate_storage(b->words);
 
     gt_mem_fill_ones(b->words, sizeof(*b->words) * b->total_words);
@@ -236,7 +236,7 @@ gt_bitmap_set_all(struct gt_bitmap *b)
 static GT_FORCE_INLINE void
 gt_bitmap_clear_all(struct gt_bitmap *b)
 {
-    __gt_bitmap_validate(b);
+    __gt_bitmap_validate_bitmap(b);
     __gt_bitmap_validate_storage(b->words);
 
     gt_mem_zero(b->words, sizeof(*b->words) * b->total_words);
@@ -254,7 +254,7 @@ gt_bitmap_clear_all(struct gt_bitmap *b)
 static GT_FORCE_INLINE bool
 gt_bitmap_find_first_set(const struct gt_bitmap *b, size_t *out_bit_index)
 {
-    __gt_bitmap_validate(b);
+    __gt_bitmap_validate_bitmap(b);
     __gt_bitmap_validate_storage(b->words);
     __gt_bitmap_validate_out_bit_index(out_bit_index);
 
@@ -279,7 +279,7 @@ gt_bitmap_find_first_set(const struct gt_bitmap *b, size_t *out_bit_index)
 static GT_FORCE_INLINE bool
 gt_bitmap_find_first_clear(const struct gt_bitmap *b, size_t *out_bit_index)
 {
-    __gt_bitmap_validate(b);
+    __gt_bitmap_validate_bitmap(b);
     __gt_bitmap_validate_storage(b->words);
     __gt_bitmap_validate_out_bit_index(out_bit_index);
 

@@ -5,10 +5,10 @@
  * @brief Deterministic reusable identifier allocator.
  */
 
-#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 
+#include <gt_internal/assert/assert.h>
 #include <gt_internal/common/compiler.h>
 #include <gt_internal/ds/bitmap/bitmap.h>
 
@@ -32,33 +32,33 @@ struct gt_id_pool
 /* -------------------------------------------------------------------------- */
 
 static GT_FORCE_INLINE void
-__gt_id_pool_validate(const struct gt_id_pool *GT_MAYBE_UNUSED p)
+__gt_id_pool_validate_pool(const struct gt_id_pool *GT_MAYBE_UNUSED p)
 {
-    assert(p != NULL);
+    GT_ASSERT(p != NULL);
 }
 
 static GT_FORCE_INLINE void
 __gt_id_pool_validate_storage(const unsigned long *GT_MAYBE_UNUSED storage)
 {
-    assert(storage != NULL);
+    GT_ASSERT(storage != NULL);
 }
 
 static GT_FORCE_INLINE void
 __gt_id_pool_validate_total_ids(size_t GT_MAYBE_UNUSED total_ids)
 {
-    assert(total_ids > 0UL);
+    GT_ASSERT(total_ids > 0UL);
 }
 
 static GT_FORCE_INLINE void
 __gt_id_pool_validate_id(const struct gt_id_pool *GT_MAYBE_UNUSED p, size_t GT_MAYBE_UNUSED id)
 {
-    assert(id < p->map.total_bits);
+    GT_ASSERT(id < p->map.total_bits);
 }
 
 static GT_FORCE_INLINE void
 __gt_id_pool_validate_out_id(const size_t *GT_MAYBE_UNUSED out_id)
 {
-    assert(out_id != NULL);
+    GT_ASSERT(out_id != NULL);
 }
 
 /**
@@ -69,7 +69,7 @@ __gt_id_pool_validate_out_id(const size_t *GT_MAYBE_UNUSED out_id)
 static GT_FORCE_INLINE void
 __gt_id_pool_validate_allocated(struct gt_id_pool *GT_MAYBE_UNUSED p, size_t GT_MAYBE_UNUSED id)
 {
-    assert(gt_bitmap_test(&p->map, id) == true);
+    GT_ASSERT(gt_bitmap_test(&p->map, id) == true);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -84,7 +84,7 @@ __gt_id_pool_validate_allocated(struct gt_id_pool *GT_MAYBE_UNUSED p, size_t GT_
 static GT_FORCE_INLINE void
 gt_id_pool_init(struct gt_id_pool *p, unsigned long *storage, size_t total_ids)
 {
-    __gt_id_pool_validate(p);
+    __gt_id_pool_validate_pool(p);
     __gt_id_pool_validate_storage(storage);
     __gt_id_pool_validate_total_ids(total_ids);
 
@@ -104,7 +104,7 @@ gt_id_pool_init(struct gt_id_pool *p, unsigned long *storage, size_t total_ids)
 static GT_FORCE_INLINE bool
 gt_id_pool_allocate(struct gt_id_pool *p, size_t *out_id)
 {
-    __gt_id_pool_validate(p);
+    __gt_id_pool_validate_pool(p);
     __gt_id_pool_validate_out_id(out_id);
 
     if (!gt_bitmap_find_first_clear(&p->map, out_id))
@@ -124,7 +124,7 @@ gt_id_pool_allocate(struct gt_id_pool *p, size_t *out_id)
 static GT_FORCE_INLINE void
 gt_id_pool_release(struct gt_id_pool *p, size_t id)
 {
-    __gt_id_pool_validate(p);
+    __gt_id_pool_validate_pool(p);
     __gt_id_pool_validate_id(p, id);
     __gt_id_pool_validate_allocated(p, id);
 
@@ -141,7 +141,7 @@ gt_id_pool_release(struct gt_id_pool *p, size_t id)
 static GT_FORCE_INLINE bool
 gt_id_pool_is_allocated(const struct gt_id_pool *p, size_t id)
 {
-    __gt_id_pool_validate(p);
+    __gt_id_pool_validate_pool(p);
     __gt_id_pool_validate_id(p, id);
 
     return gt_bitmap_test(&p->map, id);
@@ -153,7 +153,7 @@ gt_id_pool_is_allocated(const struct gt_id_pool *p, size_t id)
 static GT_FORCE_INLINE bool
 gt_id_pool_is_empty(const struct gt_id_pool *p)
 {
-    __gt_id_pool_validate(p);
+    __gt_id_pool_validate_pool(p);
 
     return gt_bitmap_is_empty(&p->map);
 }
@@ -164,7 +164,7 @@ gt_id_pool_is_empty(const struct gt_id_pool *p)
 static GT_FORCE_INLINE bool
 gt_id_pool_is_full(const struct gt_id_pool *p)
 {
-    __gt_id_pool_validate(p);
+    __gt_id_pool_validate_pool(p);
 
     return gt_bitmap_is_full(&p->map);
 }

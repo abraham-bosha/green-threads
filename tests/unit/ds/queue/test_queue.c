@@ -153,6 +153,5 @@ main(void)
     test_interleaved_operations();
 
     puts("[PASS] ds/queue");
-
     return 0;
 }

@@ -31,6 +31,5 @@ main(void)
     verify_process_output(emit_log, verify_log);
 
     puts("[PASS] log");
-
     return 0;
 }

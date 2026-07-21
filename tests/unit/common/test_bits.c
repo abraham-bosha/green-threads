@@ -33,6 +33,5 @@ main(void)
     test_power_of_two_predicate();
 
     puts("[PASS] common/bits");
-
     return 0;
 }
