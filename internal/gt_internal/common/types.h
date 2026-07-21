@@ -10,11 +10,6 @@
 typedef uint32_t gt_task_id_t;
 
 /**
- * @brief Integer type capable of storing a virtual memory address.
- */
-typedef uintptr_t gt_addr_t;
-
-/**
  * @brief Runtime lifecycle states.
  */
 typedef enum
@@ -38,16 +33,6 @@ typedef enum
 } gt_task_state_t;
 
 /**
- * @brief Supported context-switch backend implementations.
- */
-typedef enum
-{
-    GT_BACKEND_UCONTEXT = 0, /* POSIX ucontext backend. */
-    GT_BACKEND_SETJMP,       /* setjmp/longjmp backend. */
-    GT_BACKEND_ASM,          /* Assembly backend. */
-} gt_backend_type_t;
-
-/**
  * @brief Entry function executed by a task.
  */
 typedef void (*gt_task_entry_fn)(void *arg);
@@ -56,21 +41,13 @@ typedef void (*gt_task_entry_fn)(void *arg);
  * Forward Declarations
  */
 
-/* Core runtime objects */
-struct gt_runtime;
-struct gt_scheduler;
-struct gt_task;
-struct gt_context;
+/* Runtime objects */
 struct gt_vm_mapping;
-
-/* Memory subsystem */
-struct gt_stack;
-struct gt_memory;
+struct gt_context;
 
 /* Internal data structures */
-struct gt_list;
 struct gt_list_node;
+struct gt_list;
 struct gt_queue;
 struct gt_bitmap;
 struct gt_id_pool;
-struct gt_run_queue;

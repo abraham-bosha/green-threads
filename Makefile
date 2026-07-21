@@ -154,14 +154,13 @@ LDLIBS  :=
 # Runtime Library Sources
 # ============================================================================
 
-RUNTIME_SRCS := \
-	$(shell find $(SRC_DIR) -name '*.c' 2>/dev/null)
+RUNTIME_SRCS := $(shell find $(SRC_DIR) -type f \( -name "*.c" -o -name "*.S" \) 2>/dev/null)
 
-RUNTIME_OBJS := \
-	$(RUNTIME_SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/runtime/%.o)
+RUNTIME_OBJS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/runtime/%.o,$(filter %.c,$(RUNTIME_SRCS))) \
+                $(patsubst $(SRC_DIR)/%.S,$(OBJ_DIR)/runtime/%.o,$(filter %.S,$(RUNTIME_SRCS)))
 
-RUNTIME_DEPS := \
-	$(RUNTIME_SRCS:$(SRC_DIR)/%.c=$(DEP_DIR)/runtime/%.d)
+RUNTIME_DEPS := $(patsubst $(SRC_DIR)/%.c,$(DEP_DIR)/runtime/%.d,$(filter %.c,$(RUNTIME_SRCS))) \
+                $(patsubst $(SRC_DIR)/%.S,$(DEP_DIR)/runtime/%.d,$(filter %.S,$(RUNTIME_SRCS)))
 
 
 # ============================================================================
@@ -171,7 +170,7 @@ RUNTIME_DEPS := \
 $(OBJ_DIR)/runtime/%.o: $(SRC_DIR)/%.c
 	$(Q)$(MKDIR) $(dir $@)
 	$(Q)$(MKDIR) $(dir $(DEP_DIR)/runtime/$*.d)
-
+	
 	$(Q)$(CC) \
 		$(CPPFLAGS_RUNTIME) \
 		$(COMMON_CFLAGS) \
@@ -180,6 +179,17 @@ $(OBJ_DIR)/runtime/%.o: $(SRC_DIR)/%.c
 		-c $< \
 		-o $@
 
+$(OBJ_DIR)/runtime/%.o: $(SRC_DIR)/%.S
+	$(Q)$(MKDIR) $(dir $@)
+	$(Q)$(MKDIR) $(dir $(DEP_DIR)/runtime/$*.d)
+	
+	$(Q)$(CC) \
+		$(CPPFLAGS_RUNTIME) \
+		$(COMMON_CFLAGS) \
+		$(PROFILE_CFLAGS) \
+		-MMD -MP -MF $(DEP_DIR)/runtime/$*.d \
+		-c $< \
+		-o $@
 
 # ============================================================================
 # Runtime Library
@@ -433,8 +443,8 @@ lint:
 		--suppress=knownConditionTrueFalse:tests/* \
 		-I$(PUBLIC_INC_DIR) \
 		-I$(PRIVATE_INC_DIR) \
-		$(RUNTIME_SRCS) \
-        $(TEST_SUPPORT_SRCS) \
+        $(filter %.c, $(RUNTIME_SRCS)) \
+		$(TEST_SUPPORT_SRCS) \
 		$(UNIT_TEST_SRCS) \
 		$(EXAMPLE_SRCS)
 
