@@ -12,12 +12,12 @@ typedef enum
 
 struct gt_vm_mapping
 {
-    void *base;
-    size_t size;
+    void *vm_base;
+    size_t vm_size;
 };
 
 gt_status_t
-gt_vm_mapping_reserve(struct gt_vm_mapping *m, size_t size);
+gt_vm_mapping_reserve(struct gt_vm_mapping *m, size_t vm_size);
 
 gt_status_t
 gt_vm_mapping_protect(const struct gt_vm_mapping *m, gt_vm_access_t acess);

@@ -28,7 +28,7 @@ struct gt_queue
 };
 
 static GT_FORCE_INLINE void
-__gt_queue_validate_queue(const struct gt_queue * GT_MAYBE_UNUSED q)
+__gt_queue_validate_queue(const struct gt_queue *GT_MAYBE_UNUSED q)
 {
     GT_ASSERT(q != NULL);
 }

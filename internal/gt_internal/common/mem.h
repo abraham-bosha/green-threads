@@ -14,7 +14,7 @@
  * @brief Fills a memory region with zeros.
  */
 static GT_FORCE_INLINE void
-gt_mem_zero(void *ptr, size_t size)
+gt_mem_clear(void *ptr, size_t size)
 {
     memset(ptr, 0, size);
 }
@@ -23,7 +23,7 @@ gt_mem_zero(void *ptr, size_t size)
  * @brief Fills a memory region with ones.
  */
 static GT_FORCE_INLINE void
-gt_mem_fill_ones(void *ptr, size_t size)
+gt_mem_set(void *ptr, size_t size)
 {
     memset(ptr, 0xFF, size);
 }

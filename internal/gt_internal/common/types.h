@@ -42,6 +42,7 @@ typedef void (*gt_task_entry_fn)(void *arg);
 /* Runtime objects */
 struct gt_vm_mapping;
 struct gt_context;
+struct gt_stack;
 
 /* Internal data structures */
 struct gt_list_node;

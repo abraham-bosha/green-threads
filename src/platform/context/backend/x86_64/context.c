@@ -20,9 +20,9 @@ extern GT_NORETURN void
 gt_context_start(void);
 
 static GT_FORCE_INLINE void
-__gt_context_validate_context(const struct gt_context *GT_MAYBE_UNUSED context)
+__gt_context_validate_context(const struct gt_context *GT_MAYBE_UNUSED ctx)
 {
-    GT_ASSERT(context != NULL);
+    GT_ASSERT(ctx != NULL);
 }
 
 static GT_FORCE_INLINE void
@@ -42,19 +42,19 @@ __gt_context_validate_stack(void *GT_MAYBE_UNUSED stack_base, size_t GT_MAYBE_UN
 }
 
 static GT_FORCE_INLINE void
-__gt_context_clear_context(struct gt_context *context)
+__gt_context_clear(struct gt_context *ctx)
 {
-    gt_mem_zero(context, sizeof(*context));
+    gt_mem_clear(ctx, sizeof(*ctx));
 }
 
 gt_status_t
-gt_context_init(struct gt_context *context,
+gt_context_init(struct gt_context *ctx,
                 gt_context_entry_fn entry,
                 void *ctx_arg,
                 void *stack_base,
                 size_t stack_size)
 {
-    __gt_context_validate_context(context);
+    __gt_context_validate_context(ctx);
     __gt_context_validate_entry(entry);
     __gt_context_validate_stack(stack_base, stack_size);
 
@@ -84,17 +84,17 @@ gt_context_init(struct gt_context *context,
     *--sp = (uintptr_t)entry;
     *--sp = (uintptr_t)gt_context_start;
 
-    __gt_context_clear_context(context);
+    __gt_context_clear(ctx);
 
-    context->rsp = (uintptr_t)sp;
+    ctx->rsp = (uintptr_t)sp;
 
     return GT_STATUS_SUCCESS;
 }
 
 void
-gt_context_destroy(struct gt_context *context)
+gt_context_destroy(struct gt_context *ctx)
 {
-    __gt_context_validate_context(context);
+    __gt_context_validate_context(ctx);
 
-    __gt_context_clear_context(context);
+    __gt_context_clear(ctx);
 }

@@ -25,23 +25,23 @@ __gt_vm_mapping_validate_mapping(const struct gt_vm_mapping *GT_MAYBE_UNUSED m)
 }
 
 static GT_FORCE_INLINE void
-__gt_vm_mapping_validate_alignment(const void *GT_MAYBE_UNUSED base)
+__gt_vm_mapping_validate_alignment(const void *GT_MAYBE_UNUSED vm_base)
 {
-    GT_ASSERT(base != NULL);
-    GT_ASSERT(gt_page_is_aligned(base));
+    GT_ASSERT(vm_base != NULL);
+    GT_ASSERT(gt_page_is_aligned(vm_base));
 }
 
 static GT_FORCE_INLINE void
-__gt_vm_mapping_validate_size(size_t GT_MAYBE_UNUSED size)
+__gt_vm_mapping_validate_size(size_t GT_MAYBE_UNUSED vm_size)
 {
-    GT_ASSERT(size > 0UL);
-    GT_ASSERT(gt_page_is_size_aligned(size));
+    GT_ASSERT(vm_size > 0UL);
+    GT_ASSERT(gt_page_is_size_aligned(vm_size));
 }
 
 static GT_FORCE_INLINE void
 __gt_vm_mapping_validate_access(gt_vm_access_t GT_MAYBE_UNUSED access)
 {
-     GT_ASSERT_MSG(false, "Unsupported virtual memory access mode.");
+    GT_ASSERT_MSG(false, "Unsupported virtual memory access mode.");
 }
 
 /* -------------------------------------------------------------------------- */
@@ -56,8 +56,8 @@ __gt_vm_mapping_reset(struct gt_vm_mapping *m)
 {
     __gt_vm_mapping_validate_mapping(m);
 
-    m->base = NULL;
-    m->size = 0UL;
+    m->vm_base = NULL;
+    m->vm_size = 0UL;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -87,15 +87,15 @@ __gt_vm_mapping_translate_access(gt_vm_access_t access)
 /* -------------------------------------------------------------------------- */
 
 gt_status_t
-gt_vm_mapping_reserve(struct gt_vm_mapping *m, size_t size)
+gt_vm_mapping_reserve(struct gt_vm_mapping *m, size_t vm_size)
 {
     __gt_vm_mapping_validate_mapping(m);
-    __gt_vm_mapping_validate_size(size);
+    __gt_vm_mapping_validate_size(vm_size);
 
     void *base;
 
     /* Reserve anonymous virtual base space with no access permissions. */
-    base = mmap(NULL, size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    base = mmap(NULL, vm_size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
     if (base == MAP_FAILED)
     {
@@ -111,8 +111,8 @@ gt_vm_mapping_reserve(struct gt_vm_mapping *m, size_t size)
         }
     }
 
-    m->base = base;
-    m->size = size;
+    m->vm_base = base;
+    m->vm_size = vm_size;
 
     return GT_STATUS_SUCCESS;
 }
@@ -121,13 +121,13 @@ gt_status_t
 gt_vm_mapping_protect(const struct gt_vm_mapping *m, gt_vm_access_t access)
 {
     __gt_vm_mapping_validate_mapping(m);
-    __gt_vm_mapping_validate_alignment(m->base);
-    __gt_vm_mapping_validate_size(m->size);
+    __gt_vm_mapping_validate_alignment(m->vm_base);
+    __gt_vm_mapping_validate_size(m->vm_size);
 
     int prot = __gt_vm_mapping_translate_access(access);
 
     /* Apply the requested page protection. */
-    int status = mprotect(m->base, m->size, prot);
+    int status = mprotect(m->vm_base, m->vm_size, prot);
 
     if (status != 0)
     {
@@ -141,11 +141,11 @@ gt_status_t
 gt_vm_mapping_release(struct gt_vm_mapping *m)
 {
     __gt_vm_mapping_validate_mapping(m);
-    __gt_vm_mapping_validate_alignment(m->base);
-    __gt_vm_mapping_validate_size(m->size);
+    __gt_vm_mapping_validate_alignment(m->vm_base);
+    __gt_vm_mapping_validate_size(m->vm_size);
 
     /* Release the virtual memory mapping. */
-    int status = munmap(m->base, m->size);
+    int status = munmap(m->vm_base, m->vm_size);
 
     if (status != 0)
     {

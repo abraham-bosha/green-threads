@@ -117,7 +117,7 @@ gt_bitmap_init(struct gt_bitmap *b, unsigned long *words, size_t total_bits)
     b->total_bits = total_bits;
     b->total_words = total_words;
 
-    gt_mem_zero(words, sizeof(*words) * total_words);
+    gt_mem_clear(words, sizeof(*words) * total_words);
 }
 
 static GT_FORCE_INLINE bool
@@ -228,7 +228,7 @@ gt_bitmap_set_all(struct gt_bitmap *b)
     __gt_bitmap_validate_bitmap(b);
     __gt_bitmap_validate_storage(b->words);
 
-    gt_mem_fill_ones(b->words, sizeof(*b->words) * b->total_words);
+    gt_mem_set(b->words, sizeof(*b->words) * b->total_words);
 
     b->words[b->total_words - 1] &= __gt_bitmap_last_word_mask(b->total_bits);
 }
@@ -239,7 +239,7 @@ gt_bitmap_clear_all(struct gt_bitmap *b)
     __gt_bitmap_validate_bitmap(b);
     __gt_bitmap_validate_storage(b->words);
 
-    gt_mem_zero(b->words, sizeof(*b->words) * b->total_words);
+    gt_mem_clear(b->words, sizeof(*b->words) * b->total_words);
 }
 
 /* -------------------------------------------------------------------------- */

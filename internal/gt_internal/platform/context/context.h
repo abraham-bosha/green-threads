@@ -78,8 +78,7 @@ gt_context_init(struct gt_context *context,
                 gt_context_entry_fn entry,
                 void *ctx_arg,
                 void *stack_base,
-                size_t stack_size
-            );
+                size_t stack_size);
 
 /**
  * @brief Saves the current execution context and resumes another.
