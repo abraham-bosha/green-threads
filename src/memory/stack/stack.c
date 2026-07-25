@@ -62,21 +62,21 @@ gt_stack_init(struct gt_stack *s, size_t stack_size)
     guard_size = GT_STACK_GUARD_PAGES * page_size;
     mapping_size = stack_size + guard_size;
 
-    status = gt_vm_mapping_reserve(&s->mapping, mapping_size);
+    status = gt_vm_mapping_reserve(&s->s_mapping, mapping_size);
     if (status != GT_STATUS_SUCCESS)
     {
         return status;
     }
 
-    __gt_stack_validate_base(s->mapping.vm_base);
-    __gt_stack_validate_size(s->mapping.vm_size);
+    __gt_stack_validate_base(s->s_mapping.vm_base);
+    __gt_stack_validate_size(s->s_mapping.vm_size);
 
     /*
      * Exclude the leading guard pages to obtain the usable execution stack.
      */
     usable_mapping = (struct gt_vm_mapping){
-        .vm_base = (void *)((uintptr_t)s->mapping.vm_base + page_size),
-        .vm_size = s->mapping.vm_size - guard_size,
+        .vm_base = (void *)((uintptr_t)s->s_mapping.vm_base + page_size),
+        .vm_size = s->s_mapping.vm_size - guard_size,
     };
 
     /*
@@ -88,7 +88,7 @@ gt_stack_init(struct gt_stack *s, size_t stack_size)
         /*
          * Roll back the reserved mapping if stack initialization fails.
          */
-        gt_vm_mapping_release(&s->mapping);
+        gt_vm_mapping_release(&s->s_mapping);
         __gt_stack_clear(s);
 
         return status;
@@ -97,8 +97,8 @@ gt_stack_init(struct gt_stack *s, size_t stack_size)
     __gt_stack_validate_base(usable_mapping.vm_base);
     __gt_stack_validate_size(usable_mapping.vm_size);
 
-    s->stack_base = usable_mapping.vm_base;
-    s->stack_size = usable_mapping.vm_size;
+    s->s_base = usable_mapping.vm_base;
+    s->s_size = usable_mapping.vm_size;
 
     return GT_STATUS_SUCCESS;
 }
@@ -108,7 +108,7 @@ gt_stack_destroy(struct gt_stack *s)
 {
     __gt_stack_validate_stack(s);
 
-    gt_vm_mapping_release(&s->mapping);
+    gt_vm_mapping_release(&s->s_mapping);
 
     __gt_stack_clear(s);
 }

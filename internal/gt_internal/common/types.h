@@ -24,10 +24,10 @@ typedef enum
  */
 typedef enum
 {
-    GT_TASK_STATE_CREATED = 0, /* Created but not yet scheduled. */
-    GT_TASK_STATE_READY,       /* Ready to execute. */
-    GT_TASK_STATE_RUNNING,     /* Currently executing. */
-    GT_TASK_STATE_COMPLETED    /* Finished execution. */
+    GT_TASK_STATE_NEW = 0,  /* Created but not yet scheduled. */
+    GT_TASK_STATE_READY,    /* Ready to execute. */
+    GT_TASK_STATE_RUNNING,  /* Currently executing. */
+    GT_TASK_STATE_COMPLETED /* Finished execution. */
 } gt_task_state_t;
 
 /**
@@ -43,6 +43,7 @@ typedef void (*gt_task_entry_fn)(void *arg);
 struct gt_vm_mapping;
 struct gt_context;
 struct gt_stack;
+struct gt_task;
 
 /* Internal data structures */
 struct gt_list_node;

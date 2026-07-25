@@ -26,10 +26,10 @@
  */
 struct gt_stack
 {
-    struct gt_vm_mapping mapping;
+    struct gt_vm_mapping s_mapping;
 
-    void *stack_base;
-    size_t stack_size;
+    void *s_base;
+    size_t s_size;
 };
 
 /*

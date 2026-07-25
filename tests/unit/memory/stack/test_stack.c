@@ -8,8 +8,8 @@
 #include <gt/error.h>
 
 #include <gt_internal/common/align.h>
-#include <gt_internal/platform/page/page.h>
 #include <gt_internal/common/compiler.h>
+#include <gt_internal/platform/page/page.h>
 
 static void
 test_stack_initial_invariants(void)
@@ -28,28 +28,28 @@ test_stack_initial_invariants(void)
     status = gt_stack_init(&stack, stack_size);
 
     assert(status == GT_STATUS_SUCCESS);
-    assert(stack.stack_base != NULL);
-    assert(stack.stack_size != 0UL);
+    assert(stack.s_base != NULL);
+    assert(stack.s_size != 0UL);
 
-    assert(GT_IS_ALIGNED(stack.stack_size, ps));
-    assert(GT_IS_ALIGNED((uintptr_t)stack.stack_base, GT_STACK_ALIGNMENT));
-    assert(GT_IS_ALIGNED(stack.stack_size, GT_STACK_ALIGNMENT));
+    assert(GT_IS_ALIGNED(stack.s_size, ps));
+    assert(GT_IS_ALIGNED((uintptr_t)stack.s_base, GT_STACK_ALIGNMENT));
+    assert(GT_IS_ALIGNED(stack.s_size, GT_STACK_ALIGNMENT));
 
-    assert((uintptr_t)stack.stack_base > (uintptr_t)stack.mapping.vm_base);
-    assert(stack.stack_size < stack.mapping.vm_size);
+    assert((uintptr_t)stack.s_base > (uintptr_t)stack.s_mapping.vm_base);
+    assert(stack.s_size < stack.s_mapping.vm_size);
 
-    volatile int *ptr = (volatile int *)stack.stack_base;
+    volatile int *ptr = (volatile int *)stack.s_base;
     *ptr = 0xDEADBEEF;
 
     assert(*ptr == (volatile int)0xDEADBEEF);
 
     gt_stack_destroy(&stack);
-    
-    assert(stack.mapping.vm_base == NULL);
-    assert(stack.mapping.vm_size == 0UL);
 
-    assert(stack.stack_base == NULL);
-    assert(stack.stack_size == 0UL);
+    assert(stack.s_mapping.vm_base == NULL);
+    assert(stack.s_mapping.vm_size == 0UL);
+
+    assert(stack.s_base == NULL);
+    assert(stack.s_size == 0UL);
 }
 
 static void
@@ -61,17 +61,17 @@ test_stack_init_with_size_zero(void)
     status = gt_stack_init(&stack, 0UL);
 
     assert(status == GT_STATUS_SUCCESS);
-    assert(stack.stack_size == GT_STACK_DEFAULT_SIZE);
-    assert(GT_IS_ALIGNED(stack.stack_size, gt_page_size()));
-    assert(stack.stack_base != NULL);
+    assert(stack.s_size == GT_STACK_DEFAULT_SIZE);
+    assert(GT_IS_ALIGNED(stack.s_size, gt_page_size()));
+    assert(stack.s_base != NULL);
 
     gt_stack_destroy(&stack);
 
-    assert(stack.mapping.vm_base == NULL);
-    assert(stack.mapping.vm_size == 0UL);
+    assert(stack.s_mapping.vm_base == NULL);
+    assert(stack.s_mapping.vm_size == 0UL);
 
-    assert(stack.stack_base == NULL);
-    assert(stack.stack_size == 0UL);
+    assert(stack.s_base == NULL);
+    assert(stack.s_size == 0UL);
 }
 
 int
