@@ -6,6 +6,7 @@
 
 #include <gt_internal/common/types.h>
 
+#include <gt_internal/ds/list/list.h>
 #include <gt_internal/memory/stack/stack.h>
 #include <gt_internal/platform/context/context.h>
 
@@ -45,6 +46,11 @@ struct gt_task
      * @brief Execution context owned by the task.
      */
     struct gt_context t_context;
+
+    /*
+     * @brief Intrusive list node for membership in the scheduler's ready queue.
+     */
+    struct gt_list_node t_ready_node;
 };
 
 /**
