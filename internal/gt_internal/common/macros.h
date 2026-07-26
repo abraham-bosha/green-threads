@@ -31,7 +31,17 @@
 #define GT_OFFSET_OF(type, member) offsetof(type, member)
 
 /**
- * @brief Casts a pointer to a nested structural element back into a pointer to its parent enclosure
- * container.
+ * @brief Returns a pointer to the enclosing structure containing a given
+ *        member.
  */
-#define GT_CONTAINER_OF(ptr, type, member) ((type *)((char *)(ptr) - offsetof(type, member)))
+#define GT_CONTAINER_OF(ptr, type, member) (type *)((char *)(ptr) - offsetof(type, member))
+
+/**
+ * @brief Returns a pointer to the enclosing structure containing a given
+ *        member.
+ *
+ * Unlike GT_CONTAINER_OF(), this macro safely accepts a NULL member pointer
+ * and returns NULL.
+ */
+#define GT_CONTAINER_OF_SAFE(ptr, type, member) \
+    ((ptr) != NULL ? (type *)((char *)(ptr) - offsetof(type, member)) : (type *)NULL)
