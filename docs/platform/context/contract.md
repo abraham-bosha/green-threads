@@ -2,9 +2,9 @@
 
 ## Overview
 
-The Platform Context subsystem provides the runtime with an abstraction for creating, preserving, restoring, and destroying execution contexts.
+The platform context subsystem provides higher-level subsystems with an abstraction for creating, preserving, restoring, and destroying execution contexts.
 
-An execution context represents a resumable execution state. It encapsulates the operating-system and architecture-specific mechanisms required to suspend one execution flow and resume another while exposing a stable, runtime-oriented interface.
+An execution context represents a resumable execution state. it encapsulates the operating-system and architecture-specific mechanisms required to suspend one execution flow and resume another while exposing a stable, runtime-oriented interface.
 
 The subsystem owns the execution-context abstraction but does not own scheduling policy, task management, or memory management.
 
@@ -12,7 +12,7 @@ The subsystem owns the execution-context abstraction but does not own scheduling
 
 ## Design Principles
 
-### Runtime-Centric Abstractions
+### Runtime-centric Abstractions
 
 The subsystem exposes only the execution-context concepts required by the runtime rather than the complete capabilities of the underlying operating system or implementation.
 
@@ -20,11 +20,11 @@ Backend-specific details remain entirely encapsulated.
 
 ---
 
-### Execution-Centric Interfaces
+### Execution-centric Interfaces
 
 The interface describes execution mechanics rather than runtime policy.
 
-The subsystem is responsible for creating, preserving, restoring, and destroying execution contexts. It is not responsible for deciding when or why execution switches occur.
+The subsystem is responsible for creating, preserving, restoring, and destroying execution contexts. it is not responsible for deciding when or why execution switches occur.
 
 ---
 
@@ -32,11 +32,11 @@ The subsystem is responsible for creating, preserving, restoring, and destroying
 
 Backend implementations are interchangeable.
 
-Replacing one backend with another shall not require modifications to the Platform Context interface or to any higher-level subsystem.
+Replacing one backend with another shall not require modifications to the platform context interface or to any higher-level subsystem.
 
-- Runtime components
-- Scheduler components
-- Higher platform interfaces
+- runtime components
+- scheduler components
+- higher platform interfaces
 
 Only the backend implementation itself should change.
 
@@ -44,32 +44,33 @@ Only the backend implementation itself should change.
 
 ## Responsibilities
 
-The Platform Context subsystem is responsible for:
+The platform context subsystem is responsible for:
 
-- Representing execution contexts.
-- Initializing execution contexts.
-- Preserving execution state.
-- Restoring execution state.
-- Destroying execution contexts.
-- Encapsulating platform-specific context-switching mechanisms.
+- representing execution contexts.
+- initializing execution contexts.
+- configuring initial execution state.
+- preserving execution state.
+- restoring execution state.
+- destroying execution contexts.
+- encapsulating platform-specific context-switching mechanisms.
 
 ---
 
-## Non-Responsibilities
+## Non-responsibilities
 
-The Platform Context subsystem does not own or manage:
+The platform context subsystem does not own or manage:
 
-- Tasks
-- Task identifiers
-- Task states
-- Scheduling policy
-- Ready queues
-- Worker threads
-- Stack allocation
-- Stack pools
-- Guard pages
-- Virtual memory management
-- Synchronization primitives
+- tasks
+- task identifiers
+- task states
+- scheduling policy
+- ready queues
+- worker threads
+- stack allocation
+- stack pools
+- guard pages
+- virtual memory management
+- synchronization primitives
 
 These responsibilities belong to other subsystems.
 
@@ -79,30 +80,30 @@ These responsibilities belong to other subsystems.
 
 Execution contexts are owned by the runtime.
 
-The Platform Context subsystem defines and manipulates execution contexts but does not own the runtime objects that contain them.
+The platform context subsystem defines and manipulates execution contexts but does not own the runtime objects that contain them.
 
-Execution stacks are owned by the Memory subsystem.
+Execution stacks are owned by the memory subsystem.
 
-The Platform Context subsystem consumes stack memory supplied by the caller but never allocates or releases stacks itself.
+The platform context subsystem consumes stack memory supplied by the caller but never allocates or releases stacks itself.
 
 ---
 
 ## Dependencies
 
-The Platform Context subsystem may depend on:
+The platform context subsystem may depend on:
 
-- Common utility modules
-- Platform Page
-- Platform Memory (stack abstraction)
-- Backend implementation
+- common utility modules
+- platform page
+- memory subsystem (stack allocation)
+- backend implementation
 
 The subsystem shall never depend on:
 
-- Runtime
-- Scheduler
-- Task management
-- Synchronization
-- Higher-level runtime components
+- runtime
+- scheduler
+- task management
+- synchronization
+- higher-level runtime components
 
 Dependency flow shall always move downward.
 
@@ -121,9 +122,15 @@ Initialize
         ▼
 Initialized
         │
+        ▼
+Configure
+        │
+        ▼
+Configured
+        │
         ├──────────────┐
         ▼              │
-Switch Context         │
+Context Switch         │
         ▲              │
         └──────────────┘
         │
@@ -144,7 +151,7 @@ After destruction, the context may be initialized again as a new execution conte
 
 ### Ownership
 
-An execution context has exactly one owner.
+Execution contexts are embedded within runtime-owned task objects. The Platform Context subsystem operates on execution contexts but never owns the objects that contain them.
 
 Execution contexts shall never be shared between runtime objects.
 
@@ -162,6 +169,14 @@ A context shall not be initialized more than once without first being destroyed.
 
 ---
 
+### Single Configuration
+
+An initialized execution context shall be configured at most once before execution begins.
+
+Reconfiguring an execution context that has already been configured is undefined.
+
+---
+
 ### Valid Stack
 
 Context initialization requires a valid execution stack.
@@ -172,11 +187,11 @@ The supplied stack shall satisfy all platform alignment and size requirements.
 
 ### Immutable Configuration
 
-The following execution-context configuration remains immutable after initialization:
+The following execution-context configuration becomes immutable after context configuration:
 
-- Entry function
-- Entry argument
-- Stack
+- entry function
+- entry argument
+- stack
 
 Context switching modifies only the saved execution state.
 
@@ -192,9 +207,9 @@ Only initialized execution contexts may participate in context switching.
 
 The subsystem never determines:
 
-- Which context executes next.
-- Why a context switch occurs.
-- When execution switches occur.
+- which context executes next.
+- why a context switch occurs.
+- when execution switches occur.
 
 These decisions belong exclusively to the scheduler.
 
@@ -212,7 +227,7 @@ It only operates on caller-supplied stack memory.
 
 Higher-level components shall never depend on backend-specific implementation details.
 
-Backend-specific data structures and mechanisms remain entirely encapsulated by the Platform Context subsystem.
+Backend-specific data structures and mechanisms remain entirely encapsulated by the platform context subsystem.
 
 ---
 
@@ -220,18 +235,19 @@ Backend-specific data structures and mechanisms remain entirely encapsulated by 
 
 Every backend implementation shall:
 
-- Implement the Platform Context interface completely.
-- Preserve execution semantics.
-- Encapsulate all backend-specific details.
-- Expose no native implementation details upward.
-- Depend only on lower-level operating-system or architecture facilities.
+- implement the platform context interface completely.
+- preserve execution semantics.
+- encapsulate all backend-specific details.
+- expose no native implementation details upward.
+- depend only on lower-level operating-system or architecture facilities.
+- preserve the platform ABI.
 
 Backend implementations are free to use any mechanism necessary to implement execution contexts, including:
 
-- POSIX ucontext
+- posix ucontext
 - setjmp/longjmp
-- Handwritten assembly
-- Platform-native context facilities
+- handwritten assembly
+- platform-native context facilities
 
 Provided the externally observable behavior remains identical.
 
@@ -241,23 +257,25 @@ Provided the externally observable behavior remains identical.
 
 Programmer contract violations are detected through internal assertions.
 
-Backend-specific failures are translated into runtime status codes before crossing the Platform Context interface.
+Backend-specific failures are translated into status codes before crossing the platform context interface.
 
 ---
 
 ## Interface Philosophy
 
-The Platform Context subsystem exposes only execution-context operations.
+The platform context subsystem exposes only execution-context operations.
 
 Its interface is intentionally minimal and consists solely of operations required to:
 
-- Initialize an execution context.
-- Switch between execution contexts.
-- Destroy an execution context.
+- initialize
+- configure
+- save
+- load
+- destroy
 
 Additional functionality belongs only in the subsystem that owns the corresponding responsibility.
 
-The Platform Context subsystem performs execution mechanics—not runtime policy.
+The platform context subsystem performs execution mechanics—not runtime policy.
 
 ---
 

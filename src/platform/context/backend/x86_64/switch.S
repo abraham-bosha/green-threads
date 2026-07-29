@@ -3,17 +3,22 @@
 .text
 
 /*
- * Saves the current execution context and resumes another.
+ * Saves the current execution context.
  *
- * Calling convention (System V AMD64):
- *   rdi -> current context
- *   rsi -> next context
+ * System V AMD64 calling convention:
+ *
+ *      rdi -> current context
+ *
+ * Returns:
+ *      0 immediately after saving the context.
+ *      1 when the saved context is later resumed.
  */
-.global gt_context_switch
-.type gt_context_switch, @function
-gt_context_switch:
 
-    # Save the current execution context.
+.global __gt_context_save_asm
+.type __gt_context_save_asm, @function
+__gt_context_save_asm:
+
+    /* Save callee-saved registers. */
     movq %rsp, GT_CONTEXT_RSP_OFFSET(%rdi)
     movq %rbx, GT_CONTEXT_RBX_OFFSET(%rdi)
     movq %rbp, GT_CONTEXT_RBP_OFFSET(%rdi)
@@ -22,44 +27,84 @@ gt_context_switch:
     movq %r14, GT_CONTEXT_R14_OFFSET(%rdi)
     movq %r15, GT_CONTEXT_R15_OFFSET(%rdi)
 
-    # Restore the next execution context.
-    movq GT_CONTEXT_RSP_OFFSET(%rsi), %rsp
-    movq GT_CONTEXT_RBX_OFFSET(%rsi), %rbx
-    movq GT_CONTEXT_RBP_OFFSET(%rsi), %rbp
-    movq GT_CONTEXT_R12_OFFSET(%rsi), %r12
-    movq GT_CONTEXT_R13_OFFSET(%rsi), %r13
-    movq GT_CONTEXT_R14_OFFSET(%rsi), %r14
-    movq GT_CONTEXT_R15_OFFSET(%rsi), %r15
+    /*
+     * First return from gt_context_save().
+     */
+    xorl %eax, %eax
 
-    # Resume execution using the return address on the restored stack.
     ret
 
-.size gt_context_switch, .-gt_context_switch
+.size __gt_context_save_asm, .-__gt_context_save_asm
+
 
 /*
- * Bootstrap for a newly initialized execution context.
+ * Restores a previously saved execution context.
+ *
+ * System V AMD64 calling convention:
+ *
+ *      rdi -> context to restore
+ *
+ * This routine never returns normally.
+ */
+
+.global __gt_context_load_asm
+.type __gt_context_load_asm, @function
+__gt_context_load_asm:
+
+    /* Restore callee-saved registers. */
+    movq GT_CONTEXT_RSP_OFFSET(%rdi), %rsp
+    movq GT_CONTEXT_RBX_OFFSET(%rdi), %rbx
+    movq GT_CONTEXT_RBP_OFFSET(%rdi), %rbp
+    movq GT_CONTEXT_R12_OFFSET(%rdi), %r12
+    movq GT_CONTEXT_R13_OFFSET(%rdi), %r13
+    movq GT_CONTEXT_R14_OFFSET(%rdi), %r14
+    movq GT_CONTEXT_R15_OFFSET(%rdi), %r15
+
+    /*
+     * When execution resumes, gt_context_save()
+     * returns 1.
+     */
+    movl $1, %eax
+
+    ret
+
+.size __gt_context_load_asm, .-__gt_context_load_asm
+
+
+/*
+ * Bootstrap routine for a newly configured execution context.
  *
  * Initial stack layout:
  *
- *      rsp -> entry function
+ *      rsp -> gt_context_start
+ *              entry function
  *              entry argument
  *
- * Invokes:
+ * After the first context restore:
  *
  *      entry(entry_argument)
  *
- * Never returns.
+ * This routine must never return.
  */
+
 .global gt_context_start
 .type gt_context_start, @function
 gt_context_start:
 
-    popq %rax        # entry function
-    popq %rdi        # first argument (System V ABI)
+    /*
+     * Pop the configured entry function and its
+     * argument from the prepared stack frame.
+     */
+    popq %rax
+    popq %rdi
 
     call *%rax
 
-    # A context entry function must never return.
+    /*
+     * A task entry function must never return.
+     * The runtime trampoline is responsible for
+     * terminating the task.
+     */
     ud2
 
 .size gt_context_start, .-gt_context_start

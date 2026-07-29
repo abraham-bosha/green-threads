@@ -1,21 +1,21 @@
-/*
- * Unit tests for the platform context subsystem.
- *
- * Verifies context initialization, initial stack construction, and
- * context destruction. Context switching is tested separately once
- * the task subsystem is available.
- */
-
 #include <gt_internal/platform/context/context.h>
 
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 
+#include <gt/error.h>
+#include <gt_internal/common/align.h>
 #include <gt_internal/common/compiler.h>
 
-static int g_test_execution_flag = 0;
+extern GT_NORETURN void
+gt_context_start(void);
 
+static volatile int g_test_execution_flag = 0;
+
+/**
+ * @brief Standard mock entry function matching your gt_context_entry_fn signature.
+ */
 static void
 mock_task_trampoline(void *arg)
 {
@@ -23,87 +23,56 @@ mock_task_trampoline(void *arg)
     *flag = 1;
 }
 
+/**
+ * @brief Validates baseline structure zero-flushing and stack bounding math.
+ */
 static void
-test_context_initial_invariants(void)
+test_context_initialization_invariants(void)
 {
-    alignas(GT_CONTEXT_STACK_ALIGNMENT) unsigned long stack[1024];
+    uintptr_t static_stack[512] GT_ALIGNED(GT_CONTEXT_STACK_ALIGNMENT);
 
-    struct gt_context context;
+    struct gt_context ctx;
 
-    gt_status_t GT_MAYBE_UNUSED status;
-
-    status = gt_context_init(
-        &context, mock_task_trampoline, &g_test_execution_flag, stack, sizeof(stack));
-
+    gt_status_t status = gt_context_init(&ctx, (void *)static_stack, sizeof(static_stack));
     assert(status == GT_STATUS_SUCCESS);
-    assert(context.rsp != 0UL);
 
-    assert(context.rbx == 0UL);
-    assert(context.rbp == 0UL);
-    assert(context.r12 == 0UL);
-    assert(context.r13 == 0UL);
-    assert(context.r14 == 0UL);
-    assert(context.r15 == 0UL);
+    uintptr_t stack_top_boundary = (uintptr_t)static_stack + sizeof(static_stack);
+    assert(ctx.rsp == stack_top_boundary);
+    assert(GT_IS_ALIGNED(ctx.rsp, GT_CONTEXT_STACK_ALIGNMENT));
 
-    uintptr_t GT_MAYBE_UNUSED stack_top = (uintptr_t)stack + sizeof(stack);
-    assert(context.rsp < stack_top);
-    assert(context.rsp >= (uintptr_t)stack);
+    assert(ctx.rbx == 0UL);
+    assert(ctx.rbp == 0UL);
+    assert(ctx.r12 == 0UL);
+    assert(ctx.r13 == 0UL);
+    assert(ctx.r14 == 0UL);
+    assert(ctx.r15 == 0UL);
 
-    assert((context.rsp % GT_CONTEXT_STACK_ALIGNMENT) == sizeof(uintptr_t));
-
-    gt_context_destroy(&context);
-    assert(context.rsp == 0UL);
+    gt_context_destroy(&ctx);
+    assert(ctx.rsp == 0UL);
 }
 
+/**
+ * @brief Validates the asymmetric stack frame carving pushing order.
+ */
 static void
-test_context_stack_payload_order(void)
+test_context_configuration_payload_order(void)
 {
-    alignas(GT_CONTEXT_STACK_ALIGNMENT) unsigned long stack[512];
+    uintptr_t static_stack[512] __attribute__((aligned(GT_CONTEXT_STACK_ALIGNMENT)));
 
-    struct gt_context context;
-
-    gt_status_t GT_MAYBE_UNUSED status;
-
-    status = gt_context_init(
-        &context, mock_task_trampoline, &g_test_execution_flag, stack, sizeof(stack));
-
+    struct gt_context ctx;
+    gt_status_t status = gt_context_init(&ctx, (void *)static_stack, sizeof(static_stack));
     assert(status == GT_STATUS_SUCCESS);
-    assert(context.rsp != 0UL);
 
-    const uintptr_t *GT_MAYBE_UNUSED sp = (uintptr_t *)context.rsp;
+    status = gt_context_configure(&ctx, mock_task_trampoline, (void *)&g_test_execution_flag);
+    assert(status == GT_STATUS_SUCCESS);
 
-    assert(sp[0] != 0UL);
+    const uintptr_t *sp = (uintptr_t *)ctx.rsp;
+
+    assert(sp[0] == (uintptr_t)gt_context_start);
     assert(sp[1] == (uintptr_t)mock_task_trampoline);
     assert(sp[2] == (uintptr_t)&g_test_execution_flag);
 
-    gt_context_destroy(&context);
-    assert(context.rsp == 0UL);
-}
-
-static void
-test_context_destroy_clears_context(void)
-{
-    alignas(GT_CONTEXT_STACK_ALIGNMENT) unsigned long stack[4096];
-
-    struct gt_context context;
-
-    gt_status_t GT_MAYBE_UNUSED status;
-
-    status = gt_context_init(
-        &context, mock_task_trampoline, &g_test_execution_flag, stack, sizeof(stack));
-
-    assert(status == GT_STATUS_SUCCESS);
-    assert(context.rsp != 0UL);
-
-    gt_context_destroy(&context);
-
-    assert(context.rsp == 0UL);
-    assert(context.rbx == 0UL);
-    assert(context.rbp == 0UL);
-    assert(context.r12 == 0UL);
-    assert(context.r13 == 0UL);
-    assert(context.r14 == 0UL);
-    assert(context.r15 == 0UL);
+    gt_context_destroy(&ctx);
 }
 
 int
@@ -111,9 +80,8 @@ main(void)
 {
     puts("[RUN] platform/context");
 
-    test_context_initial_invariants();
-    test_context_stack_payload_order();
-    test_context_destroy_clears_context();
+    test_context_initialization_invariants();
+    test_context_configuration_payload_order();
 
     puts("[PASS] platform/context");
     return 0;
