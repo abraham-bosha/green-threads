@@ -131,7 +131,7 @@ READY
 RUNNING
         │
         ▼
-COMPLETED
+EXITED
         │
         ▼
 Destroy

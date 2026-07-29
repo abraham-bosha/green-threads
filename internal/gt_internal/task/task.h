@@ -51,6 +51,11 @@ struct gt_task
      * @brief Intrusive list node for membership in the scheduler's ready queue.
      */
     struct gt_list_node t_ready_node;
+
+    /*
+     * @brief Intrusive list node for membership in the runtime's task list.
+     */
+    struct gt_list_node t_runtime_node;
 };
 
 /**

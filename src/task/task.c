@@ -11,19 +11,6 @@
 #include <gt_internal/memory/stack/stack.h>
 #include <gt_internal/platform/context/context.h>
 
-extern GT_NORETURN void
-gt_task_exit(void);
-
-static GT_NORETURN void
-gt_task_trampoline(void *arg)
-{
-    struct gt_task *task = arg;
-
-    task->t_entry(task->t_arg);
-
-    gt_task_exit();
-}
-
 static GT_FORCE_INLINE void
 __gt_task_validate_task(const struct gt_task *GT_MAYBE_UNUSED task)
 {
@@ -64,8 +51,7 @@ gt_task_init(
         return status;
     }
 
-    status = gt_context_init(
-        &task->t_context, gt_task_trampoline, task, task->t_stack.s_base, task->t_stack.s_size);
+    status = gt_context_init(&task->t_context, task->t_stack.s_base, task->t_stack.s_size);
     if (status != GT_STATUS_SUCCESS)
     {
         gt_stack_destroy(&task->t_stack);

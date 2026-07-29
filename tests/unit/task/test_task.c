@@ -10,14 +10,6 @@
 #include <gt_internal/common/compiler.h>
 #include <gt_internal/platform/page/page.h>
 
-GT_NORETURN void
-gt_task_exit(void)
-{
-    assert(false && "Test execution should not trigger live task exit channels");
-    while (1)
-        ;
-}
-
 static void
 mock_user_workload(void *arg)
 {
@@ -26,24 +18,13 @@ mock_user_workload(void *arg)
 }
 
 static void
-test_task_init_dependencies(void)
-{
-    static bool page_initialized = false;
-    if (!page_initialized)
-    {
-        gt_status_t GT_MAYBE_UNUSED status = gt_page_init();
-        assert(status == GT_STATUS_SUCCESS);
-        page_initialized = true;
-    }
-}
-
-static void
 test_task_initialization_invariants(void)
 {
-    test_task_init_dependencies();
-
     struct gt_task task;
     gt_status_t GT_MAYBE_UNUSED status;
+
+    status = gt_page_init();
+    assert(status == GT_STATUS_SUCCESS);
 
     gt_task_id_t expected_id = 42;
     int mock_payload = 100;
@@ -64,7 +45,7 @@ test_task_initialization_invariants(void)
 
     uintptr_t GT_MAYBE_UNUSED stack_limit_top =
         (uintptr_t)task.t_stack.s_base + task.t_stack.s_size;
-    assert((uintptr_t)task.t_context.rsp < stack_limit_top);
+    assert((uintptr_t)task.t_context.rsp == stack_limit_top);
     assert((uintptr_t)task.t_context.rsp >= (uintptr_t)task.t_stack.s_base);
 
     gt_task_destroy(&task);
