@@ -33,10 +33,10 @@ test_context_initialization_invariants(void)
 
     struct gt_context ctx;
 
-    gt_status_t status = gt_context_init(&ctx, (void *)static_stack, sizeof(static_stack));
+    gt_status_t GT_MAYBE_UNUSED status = gt_context_init(&ctx, (void *)static_stack, sizeof(static_stack));
     assert(status == GT_STATUS_SUCCESS);
 
-    uintptr_t stack_top_boundary = (uintptr_t)static_stack + sizeof(static_stack);
+    uintptr_t GT_MAYBE_UNUSED stack_top_boundary = (uintptr_t)static_stack + sizeof(static_stack);
     assert(ctx.rsp == stack_top_boundary);
     assert(GT_IS_ALIGNED(ctx.rsp, GT_CONTEXT_STACK_ALIGNMENT));
 
@@ -57,16 +57,18 @@ test_context_initialization_invariants(void)
 static void
 test_context_configuration_payload_order(void)
 {
-    uintptr_t static_stack[512] __attribute__((aligned(GT_CONTEXT_STACK_ALIGNMENT)));
+    uintptr_t static_stack[512] GT_ALIGNED(GT_CONTEXT_STACK_ALIGNMENT);
 
     struct gt_context ctx;
-    gt_status_t status = gt_context_init(&ctx, (void *)static_stack, sizeof(static_stack));
+    gt_status_t GT_MAYBE_UNUSED status;
+
+    status = gt_context_init(&ctx, (void *)static_stack, sizeof(static_stack));
     assert(status == GT_STATUS_SUCCESS);
 
     status = gt_context_configure(&ctx, mock_task_trampoline, (void *)&g_test_execution_flag);
     assert(status == GT_STATUS_SUCCESS);
 
-    const uintptr_t *sp = (uintptr_t *)ctx.rsp;
+    const uintptr_t *GT_MAYBE_UNUSED sp = (uintptr_t *)ctx.rsp;
 
     assert(sp[0] == (uintptr_t)gt_context_start);
     assert(sp[1] == (uintptr_t)mock_task_trampoline);

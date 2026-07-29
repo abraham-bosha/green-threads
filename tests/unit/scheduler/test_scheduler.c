@@ -41,10 +41,10 @@ test_scheduler_fifo_admission_routing(void)
 
     task1.t_id = 101;
     task1.t_state = GT_TASK_STATE_READY;
-    
+
     task2.t_id = 102;
     task2.t_state = GT_TASK_STATE_READY;
-    
+
     task3.t_id = 103;
     task3.t_state = GT_TASK_STATE_READY;
 
@@ -53,7 +53,7 @@ test_scheduler_fifo_admission_routing(void)
 
     status = gt_scheduler_admit(&sched, &task2);
     assert(status == GT_STATUS_SUCCESS);
-    
+
     status = gt_scheduler_admit(&sched, &task3);
     assert(status == GT_STATUS_SUCCESS);
 

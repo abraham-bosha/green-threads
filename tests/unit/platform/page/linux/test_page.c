@@ -2,21 +2,24 @@
 
 #include <assert.h>
 #include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+
+#include <gt/error.h>
 
 #include <gt_internal/common/bits.h>
 #include <gt_internal/common/compiler.h>
 
 static void
-test_page_init(void)
+test_page_initial_invariants(void)
 {
-    gt_status_t GT_MAYBE_UNUSED status = gt_page_init();
+    gt_status_t GT_MAYBE_UNUSED status;
+    size_t GT_MAYBE_UNUSED ps;
+
+    status = gt_page_init();
     assert(status == GT_STATUS_SUCCESS);
 
-    size_t GT_MAYBE_UNUSED ps = gt_page_size();
-
+    ps = gt_page_size();
     assert(ps > 0UL);
     assert(GT_IS_POW2(ps));
 }
@@ -24,7 +27,9 @@ test_page_init(void)
 static void
 test_page_address_alignment(void)
 {
-    size_t GT_MAYBE_UNUSED ps = gt_page_size();
+    size_t GT_MAYBE_UNUSED ps;
+
+    ps = gt_page_size();
 
     const void *GT_MAYBE_UNUSED aligned_addr1 = (const void *)0x1000UL;
     const void *GT_MAYBE_UNUSED aligned_addr2 = (const void *)(ps * 5UL);
@@ -42,7 +47,9 @@ test_page_address_alignment(void)
 static void
 test_page_size_alignment(void)
 {
-    size_t GT_MAYBE_UNUSED ps = gt_page_size();
+    size_t GT_MAYBE_UNUSED ps;
+
+    ps = gt_page_size();
 
     assert(gt_page_is_size_aligned(0UL) == true);
     assert(gt_page_is_size_aligned(ps) == true);
@@ -56,7 +63,9 @@ test_page_size_alignment(void)
 static void
 test_page_align_up(void)
 {
-    size_t GT_MAYBE_UNUSED ps = gt_page_size();
+    size_t GT_MAYBE_UNUSED ps;
+
+    ps = gt_page_size();
 
     assert(gt_page_align_up(0UL) == 0UL);
     assert(gt_page_align_up(ps) == ps);
@@ -73,7 +82,7 @@ main(void)
 {
     puts("[RUN] platform/page");
 
-    test_page_init();
+    test_page_initial_invariants();
     test_page_address_alignment();
     test_page_size_alignment();
     test_page_align_up();

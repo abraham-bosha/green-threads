@@ -17,7 +17,9 @@ test_heap_standard_lifecycle_and_zeroing(void)
     void *ptr = NULL;
     size_t alloc_size = 128UL;
 
-    gt_status_t status = gt_heap_alloc(&ptr, alloc_size);
+    gt_status_t GT_MAYBE_UNUSED status;
+
+    status = gt_heap_alloc(&ptr, alloc_size);
     assert(status == GT_STATUS_SUCCESS);
     assert(ptr != NULL);
 
@@ -45,7 +47,9 @@ test_heap_out_of_memory_boundaries(void)
 
     size_t catastrophic_size = SIZE_MAX;
 
-    gt_status_t status = gt_heap_alloc(&ptr, catastrophic_size);
+    gt_status_t GT_MAYBE_UNUSED status;
+
+    status = gt_heap_alloc(&ptr, catastrophic_size);
     assert(status == GT_STATUS_OUT_OF_MEMORY);
     assert(ptr == NULL);
 }

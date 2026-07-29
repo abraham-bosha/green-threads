@@ -13,14 +13,17 @@
 static void
 test_vm_mapping_reserve_and_release(void)
 {
-    gt_status_t GT_MAYBE_UNUSED status = gt_page_init();
+    gt_status_t GT_MAYBE_UNUSED status;
+
+    size_t ps;
+    struct gt_vm_mapping m;
+    size_t request_size;
+
+    status = gt_page_init();
     assert(status == GT_STATUS_SUCCESS);
 
-    size_t ps = gt_page_size();
-
-    struct gt_vm_mapping m;
-
-    size_t request_size = ps * 2UL;
+    ps = gt_page_size();
+    request_size = ps * 2UL;
 
     status = gt_vm_mapping_reserve(&m, request_size);
     assert(status == GT_STATUS_SUCCESS);
@@ -41,8 +44,9 @@ test_vm_mapping_protection_transitions(void)
 {
     size_t ps = gt_page_size();
     struct gt_vm_mapping m;
+    gt_status_t GT_MAYBE_UNUSED status;
 
-    gt_status_t GT_MAYBE_UNUSED status = gt_vm_mapping_reserve(&m, ps);
+    status = gt_vm_mapping_reserve(&m, ps);
     assert(status == GT_STATUS_SUCCESS);
 
     status = gt_vm_mapping_protect(&m, GT_VM_ACCESS_READ_WRITE);
@@ -62,13 +66,14 @@ test_vm_mapping_protection_transitions(void)
 static void
 test_vm_mapping_allocation_limits(void)
 {
-    size_t ps = gt_page_size();
-
     struct gt_vm_mapping m;
+    size_t ps;
+    size_t impossible_size;
+    gt_status_t GT_MAYBE_UNUSED status;
 
-    size_t impossible_size = gt_page_align_up(INTPTR_MAX - ps);
-
-    gt_status_t GT_MAYBE_UNUSED status = gt_vm_mapping_reserve(&m, impossible_size);
+    ps = gt_page_size();
+    impossible_size = gt_page_align_up(INTPTR_MAX - ps);
+    status = gt_vm_mapping_reserve(&m, impossible_size);
 
     assert(status == GT_STATUS_OUT_OF_MEMORY);
     assert(m.vm_base == NULL);
