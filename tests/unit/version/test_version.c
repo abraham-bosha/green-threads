@@ -23,7 +23,7 @@ test_compile_time(void)
     assert(GT_VERSION_MINOR == 0);
     assert(GT_VERSION_PATCH == 0);
 
-    assert(GT_VERSION_NUMBER == 10000);
+    assert(GT_VERSION_NUMBER == 10000u);
     assert(strcmp(GT_VERSION_STRING, "1.0.0") == 0);
 }
 
@@ -33,7 +33,7 @@ test_runtime(void)
     assert(strcmp(gt_version_string(), "1.0.0") == 0);
 
     uint32_t GT_MAYBE_UNUSED v = gt_version_number();
-    assert(v == 10000);
+    assert(v == 10000u);
     assert(v == GT_VERSION_NUMBER);
 }
 

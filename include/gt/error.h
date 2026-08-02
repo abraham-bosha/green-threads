@@ -31,10 +31,10 @@ typedef enum
      * Runtime Status Codes (100–199)
      * =========================================================================
      */
-
     GT_STATUS_RUNTIME_ALREADY_INITIALIZED = 100,
     GT_STATUS_RUNTIME_NOT_INITIALIZED = 101,
     GT_STATUS_RUNTIME_RUNNING = 102,
+    GT_STATUS_RESOURCE_EXHAUSTED = 103,
 
     /*
      * =========================================================================

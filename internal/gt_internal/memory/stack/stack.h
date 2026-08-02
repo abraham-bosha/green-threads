@@ -19,7 +19,7 @@
 /*
  * Default usable stack size.
  */
-#define GT_STACK_DEFAULT_SIZE (128 * 1024)
+#define GT_STACK_DEFAULT_SIZE (64 * 1024)
 
 /*
  * Runtime execution stack.

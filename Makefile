@@ -92,13 +92,13 @@ CPPFLAGS_EXAMPLE := \
 CPPFLAGS_BENCHMARK := \
     $(CPPFLAGS_PUBLIC)
 
-# Unit tests
-CPPFLAGS_UNIT := \
+# Integration / Unit tests
+CPPFLAGS_UNIT_INTEG := \
     $(CPPFLAGS_PUBLIC) \
     $(CPPFLAGS_PRIVATE) \
     $(CPPFLAGS_TEST_SUPPORT)
 
-# Integration / Stress / Regression tests
+# Stress / Regression tests
 CPPFLAGS_PUBLIC_TEST := \
     $(CPPFLAGS_PUBLIC) \
     $(CPPFLAGS_TEST_SUPPORT)
@@ -251,21 +251,30 @@ $(TEST_SUPPORT_LIB): $(TEST_SUPPORT_OBJS)
 
 
 # ============================================================================
-# Unit Test Sources
+# Unit and Integration Test Sources
 # ============================================================================
 
 UNIT_TEST_SRCS := \
 	$(shell find $(TEST_DIR)/unit -name '*.c' 2>/dev/null)
 
+INTEGRATION_TEST_SRCS := \
+	$(shell find $(TEST_DIR)/integration -name '*.c' 2>/dev/null)
+
 UNIT_TEST_DEPS := \
 	$(UNIT_TEST_SRCS:$(TEST_DIR)/unit/%.c=$(DEP_DIR)/tests/unit/%.d)
+
+INTEGRATION_TEST_DEPS := \
+	$(INTEGRATION_TEST_SRCS:$(TEST_DIR)/integration/%.c=$(DEP_DIR)/tests/integration/%.d)
 
 UNIT_TEST_BINS := \
 	$(UNIT_TEST_SRCS:$(TEST_DIR)/unit/%.c=$(BIN_DIR)/tests/unit/%)
 
+INTEGRATION_TEST_BINS := \
+	$(INTEGRATION_TEST_SRCS:$(TEST_DIR)/integration/%.c=$(BIN_DIR)/tests/integration/%)
+
 
 # ============================================================================
-# Unit Test Object Compilation
+# Unit and Integration Test Object Compilation
 # ============================================================================
 
 $(OBJ_DIR)/tests/unit/%.o: $(TEST_DIR)/unit/%.c
@@ -273,19 +282,43 @@ $(OBJ_DIR)/tests/unit/%.o: $(TEST_DIR)/unit/%.c
 	$(Q)$(MKDIR) $(dir $(DEP_DIR)/tests/unit/$*.d)
 
 	$(Q)$(CC) \
-		$(CPPFLAGS_UNIT)  \
+		$(CPPFLAGS_UNIT_INTEG)  \
 		$(COMMON_CFLAGS)  \
 		$(PROFILE_CFLAGS) \
 		-MMD -MP -MF $(DEP_DIR)/tests/unit/$*.d \
 		-c $< \
 		-o $@
 
+$(OBJ_DIR)/tests/integration/%.o: $(TEST_DIR)/integration/%.c
+	$(Q)$(MKDIR) $(dir $@)
+	$(Q)$(MKDIR) $(dir $(DEP_DIR)/tests/integration/$*.d)
+
+	$(Q)$(CC) \
+		$(CPPFLAGS_UNIT_INTEG)  \
+		$(COMMON_CFLAGS)  \
+		$(PROFILE_CFLAGS) \
+		-MMD -MP -MF $(DEP_DIR)/tests/integration/$*.d \
+		-c $< \
+		-o $@
 
 # ============================================================================
-# Unit Tests Linking
+# Unit and Integration Tests Linking
 # ============================================================================
 
 $(BIN_DIR)/tests/unit/%: $(OBJ_DIR)/tests/unit/%.o $(GT_LIB) $(TEST_SUPPORT_LIB)
+	$(Q)$(MKDIR) $(dir $@)
+	@echo "[LD] $@"
+
+	$(Q)$(CC) \
+		$(LDFLAGS) \
+		$< \
+		$(GT_LIB) \
+		$(TEST_SUPPORT_LIB) \
+		$(LDLIBS) \
+		-o $@
+
+
+$(BIN_DIR)/tests/integration/%: $(OBJ_DIR)/tests/integration/%.o $(GT_LIB) $(TEST_SUPPORT_LIB)
 	$(Q)$(MKDIR) $(dir $@)
 	@echo "[LD] $@"
 
@@ -303,20 +336,20 @@ $(BIN_DIR)/tests/unit/%: $(OBJ_DIR)/tests/unit/%.o $(GT_LIB) $(TEST_SUPPORT_LIB)
 # ============================================================================
 
 EXAMPLE_SRCS := \
-	$(shell find $(EXAMPLE_DIR) -name 'main.c' 2>/dev/null)
+	$(shell find $(EXAMPLE_DIR) -name '*.c' 2>/dev/null)
 
 EXAMPLE_DEPS := \
-	$(EXAMPLE_SRCS:$(EXAMPLE_DIR)/%/main.c=$(DEP_DIR)/examples/%.d)
+	$(EXAMPLE_SRCS:$(EXAMPLE_DIR)/%.c=$(DEP_DIR)/examples/%.d)
 
 EXAMPLE_BINS := \
-	$(EXAMPLE_SRCS:$(EXAMPLE_DIR)/%/main.c=$(BIN_DIR)/examples/%)
+	$(EXAMPLE_SRCS:$(EXAMPLE_DIR)/%.c=$(BIN_DIR)/examples/%)
 
 
 # ============================================================================
 # Example Object Compilation
 # ============================================================================
 
-$(OBJ_DIR)/examples/%.o: $(EXAMPLE_DIR)/%/main.c
+$(OBJ_DIR)/examples/%.o: $(EXAMPLE_DIR)/%.c
 	$(Q)$(MKDIR) $(dir $@)
 	$(Q)$(MKDIR) $(dir $(DEP_DIR)/examples/$*.d)
 
@@ -351,8 +384,9 @@ $(BIN_DIR)/examples/%: $(OBJ_DIR)/examples/%.o $(GT_LIB)
 
 .PHONY: \
 	all \
-	libs \
+	lib  \
     unit \
+    integration \
 	tests \
 	examples \
 	run-tests \
@@ -381,7 +415,10 @@ libs: $(GT_LIB) $(TEST_SUPPORT_LIB)
 unit: $(UNIT_TEST_BINS)
 
 
-tests: $(UNIT_TEST_BINS)
+integration: $(INTEGRATION_TEST_BINS)
+
+
+tests: $(UNIT_TEST_BINS) $(INTEGRATION_TEST_BINS)
 
 
 examples: $(EXAMPLE_BINS)
@@ -406,7 +443,7 @@ rebuild: clean all
 run-tests: tests
 	@echo "[RUN] test suite"
 	$(Q)set -e; \
-	for test in $(UNIT_TEST_BINS); do \
+	for test in $(UNIT_TEST_BINS) $(INTEGRATION_TEST_BINS); do \
 		$$test || { echo "Failure in binary: $$test"; exit 1; }; \
 	done
 
@@ -431,7 +468,7 @@ run-examples: examples
 lint:
 	@echo "[LINT] Running cppcheck"
 	$(Q)cppcheck \
-        --quiet   \
+		--quiet   \
 		--enable=all \
 		--error-exitcode=1 \
 		--inline-suppr \
@@ -441,11 +478,14 @@ lint:
 		--suppress=checkersReport \
 		--suppress=duplicateExpression:tests/* \
 		--suppress=knownConditionTrueFalse:tests/* \
+        --suppress=constParameterPointer:src/runtime/runtime_task.c \
+		-DGT_ASSERT=assert \
 		-I$(PUBLIC_INC_DIR) \
 		-I$(PRIVATE_INC_DIR) \
-        $(filter %.c, $(RUNTIME_SRCS)) \
+		$(filter %.c, $(RUNTIME_SRCS)) \
 		$(TEST_SUPPORT_SRCS) \
 		$(UNIT_TEST_SRCS) \
+        $(INTEGRATION_TEST_SRCS) \
 		$(EXAMPLE_SRCS)
 
 
@@ -494,8 +534,9 @@ help:
 	@echo ""
 	@echo "Build Targets"
 	@echo "  all              Build library, tests, examples"
-	@echo "  libs             Build static libraries only"
+	@echo "  lib              Build static libraries only"
 	@echo "  unit             Build unit test executables"
+	@echo "  integration      Build integration test executables"
 	@echo "  tests            Build all test executables"
 	@echo "  examples         Build example executables"
 	@echo ""
@@ -523,4 +564,5 @@ help:
 -include $(RUNTIME_DEPS)
 -include $(TEST_SUPPORT_DEPS)
 -include $(UNIT_TEST_DEPS)
+-include $(INTEGRATION_TEST_DEPS)
 -include $(EXAMPLE_DEPS)

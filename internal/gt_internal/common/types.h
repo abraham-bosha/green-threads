@@ -1,22 +1,22 @@
 #pragma once
 
+#include <stddef.h>
 #include <stdint.h>
 
 /**
  * @brief Unique identifier assigned to a task.
  */
-typedef uint32_t gt_task_id_t;
+typedef size_t gt_task_id_t;
 
 /**
  * @brief Runtime lifecycle states.
  */
 typedef enum
 {
-    GT_RUNTIME_UNINITIALIZED = 0, /* Runtime has not been initialized. */
-    GT_RUNTIME_INITIALIZED,       /* Runtime is initialized and ready. */
-    GT_RUNTIME_RUNNING,           /* Scheduler is actively executing tasks. */
-    GT_RUNTIME_STOPPING,          /* Runtime is shutting down. */
-    GT_RUNTIME_STOPPED            /* Runtime has terminated. */
+    GT_RUNTIME_STATE_UNINITIALIZED = 0, /* Runtime has not been initialized. */
+    GT_RUNTIME_STATE_INITIALIZED,       /* Runtime is initialized and ready. */
+    GT_RUNTIME_STATE_RUNNING,           /* Scheduler is actively executing tasks. */
+    GT_RUNTIME_STATE_STOPPED            /* Runtime has terminated. */
 } gt_runtime_state_t;
 
 /**
@@ -24,10 +24,10 @@ typedef enum
  */
 typedef enum
 {
-    GT_TASK_STATE_NEW = 0,  /* Created but not yet scheduled. */
-    GT_TASK_STATE_READY,    /* Ready to execute. */
-    GT_TASK_STATE_RUNNING,  /* Currently executing. */
-    GT_TASK_STATE_COMPLETED /* Finished execution. */
+    GT_TASK_STATE_NEW = 0, /* Created but not yet scheduled. */
+    GT_TASK_STATE_READY,   /* Ready to execute. */
+    GT_TASK_STATE_RUNNING, /* Currently executing. */
+    GT_TASK_STATE_ZOMBIE   /* Finished execution. */
 } gt_task_state_t;
 
 /**
@@ -40,10 +40,11 @@ typedef void (*gt_task_entry_fn)(void *arg);
  */
 
 /* Runtime objects */
-struct gt_vm_mapping;
-struct gt_context;
-struct gt_stack;
+struct gt_runtime;
 struct gt_task;
+struct gt_stack;
+struct gt_context;
+struct gt_vm_mapping;
 
 /* Internal data structures */
 struct gt_list_node;
