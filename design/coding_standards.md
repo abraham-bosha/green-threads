@@ -2,7 +2,7 @@
 
 Version: 1.0
 
-Status: Frozen
+Status: Draft
 
 ---
 
@@ -65,8 +65,6 @@ gt_scheduler_enqueue();
 Types
 
 ```c
-gt_runtime_t;
-gt_task_t;
 gt_status_t;
 ```
 
@@ -86,16 +84,14 @@ enum gt_task_state;
 Enumeration Values
 
 ```c
-GT_TASK_READY
-GT_TASK_RUNNING
-GT_TASK_FINISHED
+GT_TASK_STATE_READY
+GT_TASK_STATE_RUNNING
 ```
 
 Macros
 
 ```c
 GT_ASSERT(...)
-GT_PAGE_SIZE
 GT_DEFAULT_STACK_SIZE
 ```
 
@@ -136,7 +132,6 @@ Examples:
 runtime/
 scheduler/
 memory/
-context/
 platform/
 ```
 
@@ -174,7 +169,6 @@ Examples:
 gt_runtime_init()
 gt_runtime_shutdown()
 gt_task_create()
-gt_context_switch()
 ```
 
 Avoid generic names such as:
@@ -210,16 +204,14 @@ GT_PAGE_SIZE
 Enumeration names use:
 
 ```c
-enum gt_task_state;
+gt_task_state_t;
 ```
 
 Enumeration values use:
 
 ```c
-GT_TASK_READY
-GT_TASK_RUNNING
-GT_TASK_WAITING
-GT_TASK_FINISHED
+GT_TASK_STATE_READY
+GT_TASK_STATE_RUNNING
 ```
 
 ---
@@ -355,7 +347,7 @@ Source files shall include headers in the following order:
 Example:
 
 ```c
-#include "scheduler.h"
+#include <gt_internal/scheduler.h>
 
 #include <stddef.h>
 #include <stdint.h>
@@ -448,18 +440,6 @@ Comments explain:
 Not:
 
 - what
-
-Good:
-
-```c
-/* Reserve task ID zero for the idle task. */
-```
-
-Bad:
-
-```c
-/* Increment i. */
-```
 
 ---
 

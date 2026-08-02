@@ -173,4 +173,4 @@ The bitmap follows the project's core engineering principles.
 
 ---
 
-End of Document
+End of Document.

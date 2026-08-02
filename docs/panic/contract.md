@@ -137,8 +137,4 @@ Future versions may support:
 
 ---
 
-# Related Documents
-
-- `design/architecture.md`
-- `design/invariants.md`
-- `docs/assert/contract.md`
+End of Document.

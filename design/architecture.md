@@ -1,22 +1,22 @@
 # Runtime Architecture
 
-Version: 1.0
+**Version:** 1.0
 
-Status: Draft
+**Status:** Draft
 
 ---
 
 # Purpose
 
-This document defines the high-level architecture of the green\_threads runtime.
+This document defines the high-level architecture of the green-threads runtime.
 
-It specifies the responsibilities, boundaries, ownership, and interactions of every subsystem.
+It specifies the responsibilities, ownership, boundaries, and interactions of every subsystem.
 
 Implementation details are intentionally omitted.
 
 This document is normative.
 
-If implementation conflicts with this document, the implementation is incorrect.
+If the implementation conflicts with this document, the implementation is incorrect.
 
 ---
 
@@ -24,15 +24,15 @@ If implementation conflicts with this document, the implementation is incorrect.
 
 The runtime is designed to be
 
-- simple
-- modular
-- predictable
-- extensible
-- testable
+* simple
+* modular
+* predictable
+* extensible
+* testable
 
 The architecture favors correctness over optimization.
 
-Future versions should be able to replace individual modules without redesigning the entire runtime.
+Future versions should be able to replace individual subsystems without redesigning the entire runtime.
 
 ---
 
@@ -40,15 +40,15 @@ Future versions should be able to replace individual modules without redesigning
 
 ## Single Responsibility
 
-Every subsystem owns one responsibility.
+Every subsystem owns exactly one responsibility.
 
-Subsystems should not perform work belonging to another subsystem.
+Subsystems must not perform work belonging to another subsystem.
 
 ---
 
 ## Explicit Ownership
 
-Every resource has one owner.
+Every resource has exactly one owner.
 
 Ownership transfers must be explicit.
 
@@ -76,11 +76,11 @@ Public interfaces expose only stable abstractions.
 
 Subsystems should be replaceable whenever practical.
 
-Examples:
+Examples include
 
-- ucontext → setjmp
-- setjmp → assembly
-- simple stack allocator → stack pool
+* assembly → setjmp
+* setjmp → ucontext
+* simple stack allocator → stack pool
 
 without affecting unrelated modules.
 
@@ -90,43 +90,43 @@ without affecting unrelated modules.
 
 Runtime may depend on
 
-- Scheduler
-- Task
-- Context
-- Memory
-- Platform
-- Common
-- Data Structures
+* Scheduler
+* Task
+* Context
+* Memory
+* Platform
+* Common
+* Data Structures
 
 Scheduler may depend on
 
-- Task
-- Common
-- Data Structures
+* Task
+* Common
+* Data Structures
 
 Task may depend on
 
-- Context
-- Memory
-- Common
+* Context
+* Memory
+* Common
 
 Context may depend on
 
-- Platform
-- Common
+* Platform
+* Common
 
 Memory may depend on
 
-- Platform
-- Common
+* Platform
+* Common
 
 Platform may depend on
 
-- Common
+* Common
 
-Data Structures depend only on 
+Data Structures may depend on
 
-- Common
+* Common
 
 Common depends on nothing.
 
@@ -136,16 +136,16 @@ Common depends on nothing.
 
 The runtime consists of the following modules.
 
-- Runtime
-- Scheduler
-- Task
-- Context
-- Memory
-- Platform
-- Common
-- Data Structures
+* Runtime
+* Scheduler
+* Task
+* Context
+* Memory
+* Platform
+* Common
+* Data Structures
 
-Each module has a well-defined responsibility.
+Each module has a clearly defined responsibility.
 
 ---
 
@@ -155,11 +155,11 @@ The runtime is the root of the system.
 
 Responsibilities
 
-- initialization
-- shutdown
-- configuration
-- public API entry points
-- subsystem coordination
+* initialization
+* shutdown
+* public API entry points
+* subsystem coordination
+* execution control
 
 The runtime owns every subsystem.
 
@@ -169,25 +169,24 @@ It is the only module responsible for starting and stopping the system.
 
 # Scheduler
 
-The scheduler determines which task executes next.
+The scheduler determines which runnable task executes next.
 
 Responsibilities
 
-- maintain runnable queue
-- enqueue tasks
-- dequeue tasks
-- dispatch tasks
-- process cooperative yield
+* maintain the runnable queue
+* enqueue runnable tasks
+* dequeue runnable tasks
+* select the next runnable task
 
 Version 1 implements
 
-- FIFO scheduling
-- one scheduler
-- one run queue
+* FIFO scheduling
+* one scheduler
+* one runnable queue
 
 The scheduler never allocates memory.
 
-The scheduler never performs context switching directly.
+The scheduler never performs context switching.
 
 ---
 
@@ -197,17 +196,17 @@ A task represents one execution unit.
 
 Responsibilities
 
-- lifecycle
-- task state
-- task identifier
-- context ownership
-- stack ownership
+* task initialization
+* task destruction
+* task metadata
+* execution context ownership
+* stack ownership
 
 Every task owns
 
-- one execution context
-- one stack
-- one unique identifier
+* one execution context
+* one stack
+* one unique identifier
 
 Tasks never schedule themselves.
 
@@ -219,17 +218,14 @@ The context subsystem abstracts CPU execution state.
 
 Responsibilities
 
-- create context
-- destroy context
-- switch context
+* initialize execution contexts
+* configure initial execution state
+* save execution state
+* restore execution state
 
-Version 1 uses
+Version 1 uses a dedicated x86-64 assembly backend.
 
-ucontext
-
-as the backend.
-
-The scheduler never depends on backend implementation details.
+Higher-level subsystems never depend on backend implementation details.
 
 ---
 
@@ -239,16 +235,16 @@ The memory subsystem manages runtime-owned memory.
 
 Responsibilities
 
-- allocate stacks
-- release stacks
+* allocate stacks
+* guard pages
+* release stacks
 
 Version 1 performs simple dynamic allocation.
 
 Future versions may introduce
 
-- stack pools
-- guard pages
-- custom allocators
+* stack pools
+* custom allocators
 
 without changing higher-level modules.
 
@@ -256,12 +252,12 @@ without changing higher-level modules.
 
 # Platform
 
-The platform subsystem isolates operating-system interfaces.
+The platform subsystem isolates operating-system functionality.
 
 Responsibilities
 
-- mmap
-- page information
+* virtual memory mapping
+* page information
 
 The rest of the runtime never calls operating-system APIs directly.
 
@@ -271,13 +267,13 @@ All platform-specific functionality passes through this module.
 
 # Common
 
-The common module provides shared utilities.
+The common module provides shared infrastructure.
 
 Responsibilities
 
-- compiler abstractions
-- project types
-- common macros
+* compiler abstractions
+* project types
+* common macros
 
 The common module owns no runtime state.
 
@@ -289,14 +285,14 @@ Generic data structures remain independent from the runtime.
 
 Version 1 includes
 
-- queue
-- list
-- bitmap
-- id\_pool
+* queue
+* list
+* bitmap
+* id\_pool
 
 These structures contain no scheduler-specific or task-specific behavior.
 
-They are reusable by future projects.
+They are reusable outside the runtime.
 
 ---
 
@@ -304,27 +300,31 @@ They are reusable by future projects.
 
 Runtime owns
 
-- scheduler
-- runtime configuration
-- runtime state
+* scheduler
+* runtime state
+* current task
+* main execution context
+* task registry
+* zombie registry
+* task identifier pool
 
 Scheduler owns
 
-- run queue
+* runnable queue
 
 Task owns
 
-- context
-- stack
-- identifier
+* execution context
+* stack
 
-Memory owns
+Memory manages
 
-- stack allocation
+* stack allocation
+* stack release
 
 Platform owns
 
-- operating-system interaction
+* operating-system interaction
 
 Ownership is never ambiguous.
 
@@ -334,51 +334,59 @@ Ownership is never ambiguous.
 
 Runtime initializes.
 
-     ↓
+↓
 
 Scheduler initializes.
 
-     ↓
+↓
 
 Task is created.
 
-     ↓
+↓
 
 Stack is allocated.
 
-     ↓
+↓
 
-Context is created.
+Execution context is initialized.
 
-     ↓
+↓
 
-Task enters run queue.
+Task enters the runtime registry.
 
-     ↓ 
+↓
 
-Scheduler dispatches task.
+Task enters the scheduler queue.
 
-     ↓
+↓
 
-Context switch occurs.
+Runtime starts scheduling.
 
-     ↓
+↓
+
+Scheduler selects the next runnable task.
+
+↓
+
+Context subsystem performs the context switch.
+
+↓
 
 Task executes.
 
-     ↓
+↓
 
 Task yields or exits.
 
-     ↓
+↓
 
-Scheduler resumes another task.
+Exited tasks enter the zombie registry.
 
-     ↓
+↓
 
-Task resources are released.
+Runtime reaps completed tasks.
 
-     ↓
+↓
 
 Runtime shuts down.
 
@@ -386,13 +394,13 @@ Runtime shuts down.
 
 # Context Switching
 
-The scheduler chooses the next runnable task.
+The runtime initiates every context switch.
 
-The context subsystem performs the actual switch.
+The scheduler selects the next runnable task.
 
-The scheduler must never manipulate CPU registers directly.
+The context subsystem performs the low-level register save and restore.
 
-Backend implementation details remain isolated.
+Backend implementation details remain isolated behind the Context subsystem.
 
 ---
 
@@ -402,7 +410,7 @@ Recoverable failures return status codes.
 
 Fatal runtime failures terminate through the panic subsystem.
 
-Subsystems do not silently ignore failures.
+Subsystems must never silently ignore failures.
 
 ---
 
@@ -412,15 +420,15 @@ The architecture is intentionally prepared for future extensions.
 
 Examples include
 
-- setjmp backend
-- assembly backend
-- worker threads
-- work stealing
-- timers
-- reactor
-- asynchronous I/O
+* alternative context backends
+* worker threads
+* work stealing
+* timers
+* reactor
+* asynchronous I/O
+* custom stack allocators
 
-These extensions should require adding modules rather than redesigning existing ones.
+These extensions should require adding or replacing modules rather than redesigning the architecture.
 
 ---
 
@@ -428,13 +436,13 @@ These extensions should require adding modules rather than redesigning existing 
 
 Version 1 does not support
 
-- preemptive scheduling
-- multiple schedulers
-- worker threads
-- synchronization primitives
-- asynchronous I/O
-- lock-free scheduling
-- custom memory allocators
+* preemptive scheduling
+* multiple schedulers
+* worker threads
+* synchronization primitives
+* asynchronous I/O
+* lock-free scheduling
+* custom memory allocators
 
 ---
 
@@ -442,11 +450,11 @@ Version 1 does not support
 
 Version 1 freezes
 
-- subsystem boundaries
-- ownership rules
-- dependency direction
-- layering
-- module responsibilities
+* subsystem boundaries
+* ownership rules
+* dependency direction
+* layering
+* module responsibilities
 
 Implementation details may evolve.
 
@@ -454,4 +462,4 @@ The architecture should remain stable.
 
 ---
 
-End of Document.
+**End of Document.**

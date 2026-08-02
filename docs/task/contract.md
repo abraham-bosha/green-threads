@@ -131,7 +131,7 @@ READY
 RUNNING
         │
         ▼
-EXITED
+ZOMBIE
         │
         ▼
 Destroy
@@ -172,7 +172,7 @@ Its execution context is active and its execution stack is in use.
 
 ---
 
-## COMPLETED
+## ZOMBIE
 
 The task has finished executing.
 
@@ -305,4 +305,4 @@ The Task subsystem constructs executable tasks—it does not execute them.
 
 ---
 
-End of Document
+End of Document.

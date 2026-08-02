@@ -1,10 +1,11 @@
-# Common Module Contract
+# Common Subsystem Contract
 
 The **Common** module provides the low-level infrastructure shared by every subsystem in the Green Threads runtime. It contains lightweight, header-only utilities that establish the project's fundamental language, compiler, memory, alignment, and bit manipulation abstractions.
 
 This module forms the lowest layer of the dependency graph and must remain independent of higher-level runtime components.
 
 ---
+
 
 # Module: `types.h`
 
@@ -30,6 +31,7 @@ Defines the common semantic types shared across the runtime. It serves as the pr
 
 ---
 
+
 # Module: `macros.h`
 
 ## Purpose
@@ -49,6 +51,7 @@ Provides reusable preprocessor utilities used throughout the runtime.
 - Independent of all runtime modules.
 
 ---
+
 
 # Module: `compiler.h`
 
@@ -71,6 +74,7 @@ Provides portable wrappers around compiler-specific attributes and optimization 
 
 ---
 
+
 # Module: `bits.h`
 
 ## Purpose
@@ -89,6 +93,7 @@ Provides compile-time bit manipulation primitives and bit-related constants.
 - All operations must evaluate at compile time.
 
 ---
+
 
 # Module: `mem.h`
 
@@ -130,6 +135,7 @@ The Memory Utilities module depends on:
 
 ---
 
+
 # Module: `align.h`
 
 ## Purpose
@@ -150,6 +156,7 @@ Provides alignment utilities used by allocators, stacks, and low-level address a
 - Architectural assumptions should be verified with compile-time assertions whenever possible.
 
 ---
+
 
 # Dependency Rules
 
@@ -186,4 +193,4 @@ The Common module must never depend on:
 
 ---
 
-End of Document
+End of Document.

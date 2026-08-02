@@ -105,17 +105,4 @@ Thread safety depends on the underlying operating-system virtual memory implemen
 
 ---
 
-## Version 1 Scope
-
-Version 1 provides:
-
-- Virtual memory region reservation
-- Virtual memory region release
-- Virtual memory protection management
-- Runtime-to-platform protection translation
-
-Future versions may extend the module with additional virtual memory capabilities as required by the runtime.
-
----
-
-End of Document
+End of Document.

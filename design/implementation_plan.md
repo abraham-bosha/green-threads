@@ -95,9 +95,10 @@ ds/
 
 ## Order
 
-1. bitmap
-2. id\_pool
-3. queue
+1. list
+2. queue
+3. bitmap
+4. id\_pool
 
 Each structure must have unit tests before continuing.
 
@@ -121,7 +122,7 @@ platform/
 
 ## Tasks
 
-- mmap wrapper
+- virtual memory mapping
 - page information
 
 ## Deliverable
@@ -145,12 +146,12 @@ memory/
 ## Tasks
 
 - stack allocation
+- guard pages
 - stack destruction
 
 Version 1 intentionally excludes
 
 - pools
-- guard pages
 - statistics
 
 ## Deliverable
@@ -173,7 +174,7 @@ context/
 
 ## Backend
 
-ucontext
+assembly
 
 ## Tasks
 
@@ -213,7 +214,6 @@ Every task owns
 
 - stack
 - context
-- identifier
 
 ## Deliverable
 
@@ -241,12 +241,10 @@ FIFO
 
 - enqueue
 - dequeue
-- dispatch
-- yield
+- admit
+- select\_next
 
 The scheduler does not perform context switching.
-
-It requests the Context subsystem to perform the switch.
 
 ## Deliverable
 
@@ -399,16 +397,6 @@ v8  Preemptive Runtime
         ▼
 v9  Production Runtime
 
-
-                Context Backend Evolution
-
-           ucontext
-               │
-               ▼
-           setjmp
-               │
-               ▼
-           assembly
 
 These versions are outside the Version 1 implementation plan.
 

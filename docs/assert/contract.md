@@ -55,7 +55,7 @@ No public API is exposed.
 
 ### Project Dependencies
 
-- common/compiler
+- common utilities
 - panic
 
 ### Standard Library Dependencies
@@ -133,14 +133,6 @@ Future versions may introduce:
 - Runtime-configurable assertion levels.
 - Expensive debug-only invariant validation.
 - Structured diagnostic metadata.
-
----
-
-## Related Documents
-
-- `docs/panic/contract.md`
-- `design/invariants.md`
-- `design/project_contract.md`
 
 ---
 

@@ -97,15 +97,9 @@ The exact presentation may evolve in future versions without changing the public
 
 ## Dependencies
 
-### Standard Library
+### Project Dependencies
 
-* `<stdio.h>`
-* `<stdarg.h>`
-
-### Project
-
-* `common/compiler.h`
-* `common/macros.h`
+- common utilities
 
 ---
 

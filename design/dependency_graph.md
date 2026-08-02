@@ -361,21 +361,24 @@ Data structures are generic infrastructure and must remain completely independen
 
 Version 1 includes the following data structures.
 
+## list
+
+Depends on 
+
+- Common
+
 ## queue
 
 Depends on
 
+- list
 - Common
-
----
 
 ## bitmap
 
 Depends on
 
 - Common
-
----
 
 ## id\_pool
 
@@ -470,7 +473,8 @@ Platform
 ```text
 ds
 │
-├── queue
+├── list
+├── queue 
 ├── bitmap
 └── id_pool
 ```
@@ -550,7 +554,6 @@ The following dependency directions are permanently prohibited.
 ```text
 Runtime → Linux
 Runtime → POSIX
-Runtime → C Standard Library
 ```
 
 ---
@@ -788,8 +791,6 @@ Architectural convenience is never sufficient justification for violating the de
 ---
 
 # Stability
-
-This dependency graph is frozen for **Version 1**.
 
 The following properties are considered stable:
 

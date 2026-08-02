@@ -242,15 +242,6 @@ Every backend implementation shall:
 - depend only on lower-level operating-system or architecture facilities.
 - preserve the platform ABI.
 
-Backend implementations are free to use any mechanism necessary to implement execution contexts, including:
-
-- posix ucontext
-- setjmp/longjmp
-- handwritten assembly
-- platform-native context facilities
-
-Provided the externally observable behavior remains identical.
-
 ---
 
 ## Error Handling
@@ -279,4 +270,4 @@ The platform context subsystem performs execution mechanics—not runtime policy
 
 ---
 
-End of Document
+End of Document.

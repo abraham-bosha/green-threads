@@ -55,7 +55,6 @@ The runtime is the root of the system.
 The following conditions must always hold.
 
 * the runtime must be initialized before use
-* the runtime must not be initialized more than once
 * the runtime must remain valid while tasks exist
 * runtime shutdown must occur only after all runtime-owned resources are released
 * runtime state must remain internally consistent
@@ -71,6 +70,7 @@ Version 1 runtime states are:
 - UNINITIALIZED
 - INITIALIZED
 - RUNNING
+- STOPPED
 - SHUTDOWN
 
 Valid transitions:
@@ -80,6 +80,8 @@ UNINITIALIZED
 INITIALIZED
     ↓
 RUNNING
+    ↓
+STOPPED
     ↓
 SHUTDOWN
 
@@ -132,10 +134,10 @@ A task must never exist simultaneously in multiple states.
 
 Version 1 task states are:
 
-* CREATED
-* RUNNABLE
+* NEW
+* READY
 * RUNNING
-* COMPLETED
+* ZOMBIE
 
 Valid transitions:
 
@@ -145,7 +147,7 @@ Valid transitions:
              │ (admit)
              ▼
        ┌───────────┐
-       │  RUNNABLE │ ◄───┐
+       │  READY    │ ◄───┐
        └─────┬─────┘     │
              │           │
              │(dispatch) │ (yield)
@@ -157,7 +159,7 @@ Valid transitions:
              │ (exit)
              ▼
        ┌───────────┐
-       │ COMPLETED │
+       │ ZOMBIE    │
        └───────────┘
 
 The following conditions must always hold.

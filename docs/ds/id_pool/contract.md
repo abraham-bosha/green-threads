@@ -74,8 +74,6 @@ The module guarantees:
 
 |   Operation     |   Complexity    |
 |-----------------|-----------------|
-| Create          | O(n)            |
-| Destroy         | O(1)            |
 | Allocate ID     | O(n) worst case |
 | Release ID      | O(1)            |
 | Test Allocation | O(1)            |
@@ -118,4 +116,4 @@ Future versions may support:
 
 ---
 
-End of Document
+End of Document.

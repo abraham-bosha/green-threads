@@ -1,6 +1,6 @@
 # Project Contract
 
-Project green\_threads
+Project green-threads
 
 Version: 1.0
 
@@ -10,7 +10,7 @@ Status: Draft
 
 # Purpose
 
-green\_threads is a user-space cooperative green-thread runtime written in C.
+green-threads is a user-space cooperative green-thread runtime written in C.
 
 The project exists to study and implement the fundamental building blocks of modern language runtimes, schedulers, and asynchronous execution systems while maintaining a clean, modular, and production-quality architecture.
 
@@ -44,7 +44,7 @@ Version 1 includes:
 - a single execution thread
 - FIFO scheduling
 - dynamically allocated task stacks
-- ucontext backend
+- assembly backend
 - reusable data structures
 - modular runtime architecture
 - unit and integration tests
@@ -70,7 +70,6 @@ The following are intentionally excluded from Version 1.
 ## Context Switching
 
 - setjmp()/longjmp() backend
-- assembly backend
 
 ## Memory
 
@@ -253,7 +252,7 @@ Tasks execute until:
 
 Version 1 uses:
 
-ucontext
+- handwritten assmebly
 
 as the only supported backend.
 
@@ -283,14 +282,6 @@ The runtime must never rely on undefined behavior.
 
 ---
 
-# Coding Standards
-
-The project follows consistent naming, formatting, and architectural conventions.
-
-These standards are defined separately and apply to all source files.
-
----
-
 # Success Criteria
 
 Version 1 is considered complete when all of the following are true.
@@ -315,7 +306,6 @@ No additional functionality is required for Version 1.
 Future releases may introduce:
 
 - setjmp()/longjmp()
-- assembly context switching
 - stack pools
 - guard pages
 - worker threads

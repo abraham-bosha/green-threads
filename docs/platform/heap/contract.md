@@ -87,4 +87,4 @@ Keeping the interface minimal makes it straightforward to replace the underlying
 
 ---
 
-End of Document
+End of Document.

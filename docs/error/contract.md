@@ -163,8 +163,4 @@ The existing numeric layout shall remain stable across future versions.
 
 ---
 
-# API Status
-
-The public interface remains under design.
-
-The API will not be frozen until Version 1 reaches feature completion.
+End of Document.

@@ -242,4 +242,4 @@ Any future extension shall preserve the intrusive design, circular sentinel repr
 
 ---
 
-**End of Document.**
+End of Document.

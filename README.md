@@ -17,7 +17,7 @@ This project focuses strictly on runtime systems concepts:
 
 - User-space thread scheduling (green threads)
 - Task lifecycle management
-- Context switching abstractions (future backend experiments)
+- Context switching abstractions
 - Memory and execution control at the runtime level
 - Performance and correctness trade-offs in concurrency models
 
@@ -33,9 +33,7 @@ The project explicitly avoids:
 
 ## Status
 
-**Early-stage systems project (v1)**
-
-Core architecture is under active design and incremental implementation.
+**v1**
 
 ---
 
