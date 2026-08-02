@@ -60,7 +60,10 @@ __gt_page_validate_alignable_size(size_t GT_MAYBE_UNUSED size)
 gt_status_t
 gt_page_init(void)
 {
-    GT_ASSERT(!__gt_page_size_initialized);
+    if (__gt_page_size_initialized)
+    {
+        return GT_STATUS_SUCCESS;
+    }
 
     /* Discover the system page size from the operating system. */
     long ps;

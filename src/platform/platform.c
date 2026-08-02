@@ -1,7 +1,5 @@
 #include <gt_internal/platform/platform.h>
 
-#include <gt_internal/assert/assert.h>
-
 gt_status_t
 gt_platform_init(void)
 {
