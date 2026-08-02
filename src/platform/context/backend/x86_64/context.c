@@ -16,16 +16,6 @@ extern GT_NORETURN void
 gt_context_start(void);
 
 /*
- * Architecture-specific context switching routines implemented in
- * switch.S.
- */
-extern int
-__gt_context_save_asm(struct gt_context *current);
-
-extern GT_NORETURN void
-__gt_context_load_asm(const struct gt_context *next);
-
-/*
  * --------------------------------------------------------------------------
  * Validation helpers
  * --------------------------------------------------------------------------
@@ -130,25 +120,6 @@ gt_context_configure(struct gt_context *ctx, gt_context_entry_fn entry, void *ar
     __gt_context_build_initial_frame(ctx, entry, arg);
 
     return GT_STATUS_SUCCESS;
-}
-
-int
-gt_context_save(struct gt_context *current)
-{
-    __gt_context_validate_context(current);
-
-    return __gt_context_save_asm(current);
-}
-
-GT_NORETURN
-void
-gt_context_load(const struct gt_context *next)
-{
-    __gt_context_validate_context(next);
-
-    __gt_context_load_asm(next);
-
-    GT_UNREACHABLE();
 }
 
 void

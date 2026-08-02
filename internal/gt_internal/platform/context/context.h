@@ -10,6 +10,7 @@
 
 #include <gt/error.h>
 #include <gt_internal/common/compiler.h>
+#include <gt_internal/platform/context/context_asm.h>
 
 /**
  * @brief Required alignment of every task stack.
@@ -64,30 +65,27 @@ gt_context_init(struct gt_context *ctx, void *stack_base, size_t stack_size);
 gt_status_t
 gt_context_configure(struct gt_context *ctx, gt_context_entry_fn entry, void *arg);
 
-/**
- * @brief Saves the currently executing context.
+/*
+ * These wrappers are intentionally defined as force-inline.
  *
- * Stores the processor state of the current execution context into the
- * supplied context object.
+ * Context save/load form the ABI boundary between C and the low-level
+ * context switching implementation. Introducing an additional C wrapper
+ * frame changes the captured continuation and may invalidate context
+ * restoration semantics.
  *
- * @return
- *  - 0 when the context has just been saved.
- *  - Non-zero when the context is later resumed.
+ * Do not move these wrappers into a separate translation unit.
  */
-int
-gt_context_save(struct gt_context *current);
+GT_FORCE_INLINE int
+gt_context_save(struct gt_context *current)
+{
+    return __gt_context_save_asm(current);
+}
 
-/**
- * @brief Restores a previously saved execution context.
- *
- * Restores the processor state stored in the supplied context. Execution
- * continues from the point at which that context was previously saved.
- *
- * This function does not return.
- */
-GT_NORETURN
-void
-gt_context_load(const struct gt_context *next);
+GT_FORCE_INLINE GT_NORETURN void
+gt_context_load(const struct gt_context *next)
+{
+    __gt_context_load_asm(next);
+}
 
 /**
  * @brief Releases resources associated with an execution context.

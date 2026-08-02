@@ -61,8 +61,7 @@ __gt_context_load_asm:
     movq GT_CONTEXT_R15_OFFSET(%rdi), %r15
 
     /*
-     * When execution resumes, gt_context_save()
-     * returns 1.
+     * When execution resumes, the return value is 1.
      */
     movl $1, %eax
 
@@ -76,13 +75,13 @@ __gt_context_load_asm:
  *
  * Initial stack layout:
  *
- *      rsp -> gt_context_start
+ *      rsp ->  gt_context_start
  *              entry function
  *              entry argument
  *
  * After the first context restore:
  *
- *      entry(entry_argument)
+ *      entry_function(entry_argument)
  *
  * This routine must never return.
  */

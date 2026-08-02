@@ -33,7 +33,8 @@ test_context_initialization_invariants(void)
 
     struct gt_context ctx;
 
-    gt_status_t GT_MAYBE_UNUSED status = gt_context_init(&ctx, (void *)static_stack, sizeof(static_stack));
+    gt_status_t GT_MAYBE_UNUSED status =
+        gt_context_init(&ctx, (void *)static_stack, sizeof(static_stack));
     assert(status == GT_STATUS_SUCCESS);
 
     uintptr_t GT_MAYBE_UNUSED stack_top_boundary = (uintptr_t)static_stack + sizeof(static_stack);
